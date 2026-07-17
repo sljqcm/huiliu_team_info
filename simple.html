@@ -114,13 +114,9 @@ const state = {
   ],
   currentTheme: JSON.parse(localStorage.getItem('huiliu-theme')) || {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'},
   activeModuleId: null,
-  sidebarOpen: false
+  sidebarOpen: false,
+  scale: 1
 };
-
-// 初始化默认选中第一个模块
-if (!state.activeModuleId && state.modules.length > 0) {
-  state.activeModuleId = state.modules[0].id;
-}
 
 function save() {
   localStorage.setItem('huiliu-modules', JSON.stringify(state.modules));
@@ -141,12 +137,7 @@ function render() {
     document.body.style.backgroundImage = '';
   }
 
-  // 查找当前激活的模块
-  let activeModule = state.modules.find(m => m.id === state.activeModuleId);
-  if (!activeModule && state.modules.length > 0) {
-    activeModule = state.modules[0];
-    state.activeModuleId = activeModule.id;
-  }
+  const activeModule = state.modules.find(m => m.id === state.activeModuleId);
 
   let html = `
   <div class="header" style="background:linear-gradient(135deg,${t.primary},${t.secondary})">
@@ -157,29 +148,27 @@ function render() {
     <button class="btn btn-secondary" onclick="exportData()">⬇️ 导出数据</button>
     <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ 导入数据</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-  </div>
-  <div class="layout">
-    <div class="overlay ${state.sidebarOpen ? 'show' : ''}" onclick="toggleSidebar()"></div>
-    <aside class="sidebar ${state.sidebarOpen ? 'show' : ''}">
-      <div class="sidebar-title">模块目录</div>
-      <nav style="display:flex;flex-direction:column;gap:0.25rem">`;
+  </div>`;
 
-  if (state.modules.length === 0) {
-    html += `<p style="text-align:center;padding:1rem;color:#94a3b8;font-size:0.875rem">暂无模块</p>`;
-  } else {
+  if (activeModule) {
+    // 详情视图
+    html += `<div class="layout">
+      <div class="overlay ${state.sidebarOpen ? 'show' : ''}" onclick="toggleSidebar()"></div>
+      <aside class="sidebar ${state.sidebarOpen ? 'show' : ''}">
+        <button class="nav-item" style="margin-bottom:0.5rem;border-bottom:1px solid #e2e8f0;border-radius:0;padding-bottom:0.5rem" onclick="backToList()">← 返回总览</button>
+        <div class="sidebar-title">模块目录</div>
+        <nav style="display:flex;flex-direction:column;gap:0.25rem">`;
+
     state.modules.forEach(m => {
-      const isActive = activeModule && m.id === activeModule.id;
+      const isActive = m.id === activeModule.id;
       const icon = m.type === 'personnel' ? '👥' : '📋';
       html += `<button class="nav-item ${isActive ? 'active' : ''}" onclick="selectModule('${m.id}')">${icon} ${m.title}</button>`;
     });
-  }
 
-  html += `</nav>
-    </aside>
-    <main class="workspace">
-      <button class="sidebar-toggle" onclick="toggleSidebar()">☰ 打开目录</button>`;
+    html += `</nav></aside>
+      <main class="workspace">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰ 目录</button>`;
 
-  if (activeModule) {
     const m = activeModule;
     const icon = m.type === 'personnel' ? '👥' : '📋';
     html += `<div class="card">
@@ -223,13 +212,49 @@ function render() {
       html += `<button class="btn-add" onclick="showAddItem('${m.id}')">+ 添加子项</button>`;
     }
 
-    html += `</div></div>`;
+    html += `</div></div></main></div>`;
   } else {
-    html += `<div style="text-align:center;padding:4rem 1rem;color:#94a3b8">暂无模块，请点击上方按钮添加大项</div>`;
+    // 总览视图：小方块网格 + 缩放控制
+    const scale = state.scale;
+    html += `<div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:0.75rem;margin-bottom:1.5rem">
+        <div style="display:flex;align-items:center;gap:0.5rem;font-weight:500;color:${t.primary}">📋 模块总览 <span style="font-size:0.875rem;opacity:0.6">（共 ${state.modules.length} 个）</span></div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <button class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" onclick="zoomOut()" ${scale <= 0.7 ? 'disabled' : ''}>－</button>
+          <span style="font-size:0.875rem;font-weight:500;width:3rem;text-align:center;color:${t.primary}">${Math.round(scale * 100)}%</span>
+          <button class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" onclick="zoomIn()" ${scale >= 1.5 ? 'disabled' : ''}>＋</button>
+        </div>
+      </div>`;
+
+    if (state.modules.length === 0) {
+      html += `<div style="text-align:center;padding:4rem 1rem;color:#94a3b8">暂无模块，请点击上方按钮添加大项</div>`;
+    } else {
+      const cardW = 210 * scale;
+      const cardH = 150 * scale;
+      html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(${cardW}px,1fr));gap:1rem">`;
+      state.modules.forEach(m => {
+        const icon = m.type === 'personnel' ? '👥' : '📋';
+        const count = m.type === 'personnel' ? (m.persons || []).length : m.items.length;
+        const countLabel = m.type === 'personnel' ? '成员' : '条目';
+        html += `<button onclick="selectModule('${m.id}')" style="position:relative;height:${cardH}px;background:linear-gradient(135deg,${t.primary},${t.secondary});border:none;border-radius:1rem;cursor:pointer;overflow:hidden;color:#fff;text-align:left;padding:${0.75*scale}rem;transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.1)" onmouseover="this.style.transform='scale(1.03)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
+          <div style="position:absolute;top:-1.5rem;right:-1.5rem;width:6rem;height:6rem;border-radius:50%;background:radial-gradient(circle,white,transparent 70%);opacity:0.2"></div>
+          <div style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between">
+              <span style="font-size:${1.5*scale}rem">${icon}</span>
+              <span style="font-size:${0.65*scale}rem;opacity:0.75;background:rgba(255,255,255,0.2);padding:${0.15*scale}rem ${0.4*scale}rem;border-radius:9999px">${m.type === 'personnel' ? '人员' : '内容'}</span>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:${1.05*scale}rem;line-height:1.2;margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.title}</div>
+              <div style="font-size:${0.7*scale}rem;opacity:0.8">${count} 个${countLabel}</div>
+            </div>
+          </div>
+        </button>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
   }
 
-  html += `</main>
-  </div>`;
   document.getElementById('app').innerHTML = html;
   document.body.style.background = t.bg;
 }
@@ -240,8 +265,23 @@ function selectModule(id) {
   render();
 }
 
+function backToList() {
+  state.activeModuleId = null;
+  render();
+}
+
 function toggleSidebar() {
   state.sidebarOpen = !state.sidebarOpen;
+  render();
+}
+
+function zoomIn() {
+  state.scale = Math.min(1.5, state.scale + 0.1);
+  render();
+}
+
+function zoomOut() {
+  state.scale = Math.max(0.7, state.scale - 0.1);
   render();
 }
 
