@@ -6,508 +6,600 @@
 <title>灰硫班组信息</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f0f4f8;min-height:100vh}
-.header{background:linear-gradient(135deg,#1e3a5f,#3b82f6);color:#fff;padding:2rem 1rem;text-align:center}
-.header h1{font-size:2rem;font-weight:700;margin-bottom:0.5rem}
-.btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:0.5rem;font-weight:500;cursor:pointer;border:none;margin:0.25rem}
-.btn-primary{background:#fff;color:#1e3a5f}
-.btn-secondary{background:rgba(255,255,255,0.2);color:#fff}
-.layout{display:flex;max-width:1200px;margin:0 auto;min-height:calc(100vh - 200px)}
-.sidebar{width:240px;background:#fff;border-right:1px solid #e2e8f0;padding:1rem;flex-shrink:0}
-.sidebar-title{font-weight:700;padding-bottom:0.5rem;margin-bottom:0.5rem;border-bottom:1px solid #e2e8f0;color:#1e3a5f}
-.nav-item{display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.6rem 0.75rem;border-radius:0.5rem;cursor:pointer;border:none;background:transparent;text-align:left;font-size:0.875rem;color:#475569;transition:all 0.2s}
-.nav-item:hover{background:rgba(59,130,246,0.1)}
-.nav-item.active{background:#3b82f6;color:#fff;font-weight:600}
-.workspace{flex:1;padding:1rem;min-width:0}
-.sidebar-toggle{display:none;padding:0.5rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:0.5rem;cursor:pointer;margin-bottom:1rem}
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:40}
-.overlay.show{display:block}
-@media(max-width:768px){
-  .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);transition:transform 0.3s;z-index:50;overflow-y:auto}
-  .sidebar.show{transform:translateX(0)}
-  .sidebar-toggle{display:inline-flex;align-items:center;gap:0.5rem}
-}
-.card{background:#fff;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden}
-.card-header{background:#1e3a5f;color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center}
-.card-header h2{font-size:1.25rem}
-.card-body{padding:1rem}
-.item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem;margin-bottom:0.5rem;position:relative}
-.item:hover .item-actions{opacity:1}
-.item-actions{position:absolute;right:0.5rem;top:50%;transform:translateY(-50%);opacity:0;transition:opacity 0.2s}
-.btn-icon{padding:0.5rem;border-radius:0.375rem;border:none;cursor:pointer}
-.btn-edit{background:#dbeafe;color:#3b82f6}
-.btn-delete{background:#fee2e2;color:#ef4444}
-.btn-add{width:100%;padding:0.75rem;border:2px dashed #e2e8f0;background:transparent;border-radius:0.5rem;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center;gap:0.5rem}
-.btn-add:hover{border-color:#3b82f6;background:#eff6ff;color:#3b82f6}
-.person-card{position:relative;padding:1rem;border-radius:1rem;margin-bottom:0.5rem;overflow:hidden;transition:all 0.3s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:default}
-.person-card:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.15)}
-.person-card-glow{position:absolute;top:-2rem;right:-2rem;width:6rem;height:6rem;border-radius:50%;opacity:0.2;transition:opacity 0.3s}
-.person-card:hover .person-card-glow{opacity:0.4}
-.person-avatar{width:2.75rem;height:2.75rem;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
-.person-actions{display:flex;gap:0.375rem;opacity:0;transition:opacity 0.2s}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.container{max-width:80rem;margin:0 auto;padding:1rem .75rem;flex:1;width:100%}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;margin-bottom:1.25rem;border-radius:1rem;box-shadow:0 10px 30px -10px rgba(0,0,0,.1);border:1px solid rgba(255,255,255,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.nav-logo{display:flex;align-items:center;gap:.75rem}
+.logo-box{width:3rem;height:3rem;border-radius:1rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.25rem;box-shadow:0 4px 12px rgba(249,115,22,.25)}
+.nav-title{font-weight:700;font-size:1.5rem;line-height:1.1}
+.nav-sub{font-size:.875rem;opacity:.6}
+.nav-actions{display:flex;align-items:center;gap:.5rem}
+.btn{display:inline-flex;align-items:center;gap:.375rem;padding:.5rem .75rem;border-radius:.5rem;font-size:.875rem;font-weight:500;cursor:pointer;border:none;transition:transform .2s}
+.btn-primary{color:#fff;box-shadow:0 4px 12px rgba(249,115,22,.3)}
+.btn-icon{width:2.25rem;height:2.25rem;padding:0;justify-content:center;border-radius:.5rem}
+.btn-icon:hover{transform:scale(1.1)}
+.page-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding:.75rem 1.5rem;margin-bottom:1.25rem;border-radius:1rem;box-shadow:0 10px 30px -10px rgba(0,0,0,.1);border:1px solid rgba(255,255,255,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.page-title{display:flex;align-items:center;gap:.5rem;font-size:1.25rem;font-weight:700}
+.badge{font-size:.75rem;padding:.15rem .5rem;border-radius:.375rem;font-weight:500}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+.card-list{display:flex;flex-direction:column;gap:.75rem}
+.module-card{border-radius:1rem;overflow:hidden;transition:all .3s;box-shadow:0 10px 30px -10px rgba(0,0,0,.1);border:1px solid rgba(255,255,255,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:pointer}
+.module-card:hover{transform:translateY(-2px);box-shadow:0 20px 40px -10px rgba(0,0,0,.15)}
+.module-card.expanded{transform:translateY(-2px);box-shadow:0 20px 40px -10px rgba(0,0,0,.15)}
+.card-head{position:relative;padding:14px 20px;overflow:hidden}
+.card-topbar{position:absolute;top:0;left:0;right:0;height:4px}
+.card-glow{position:absolute;top:-24px;right:-24px;width:60px;height:60px;border-radius:50%;opacity:.2}
+.card-head-inner{position:relative;display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding-top:4px}
+.card-icon-box{width:36px;height:36px;border-radius:.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.125rem;flex-shrink:0;box-shadow:0 2px 8px rgba(249,115,22,.3)}
+.card-info{min-width:0;flex:1}
+.card-title{font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.card-count{font-size:.75rem;opacity:.7;margin-top:.125rem}
+.card-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.chevron{transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+.card-body{padding:12px 16px 16px;border-top:1px solid rgba(255,255,255,.5);animation:slideDown .25s ease-out}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.item-list{display:flex;flex-direction:column;gap:.5rem}
+.item-block{border-radius:.75rem;padding:.75rem;display:flex;align-items:flex-start;gap:.75rem;transition:all .2s;cursor:pointer}
+.item-block:hover{transform:translateX(2px)}
+.item-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:8px}
+.item-expand{flex-shrink:0;padding:.25rem;border-radius:.375rem;font-size:.875rem;display:flex;align-items:center;justify-content:center}
+.item-content{flex:1;min-width:0}
+.item-text{font-size:.875rem;font-weight:500;line-height:1.4}
+.item-date{font-size:.75rem;opacity:.6;margin-top:.25rem;display:flex;align-items:center;gap:.25rem}
+.item-actions{display:flex;gap:.25rem;flex-shrink:0;opacity:0;transition:opacity .2s}
+.item-block:hover .item-actions{opacity:1}
+.item-btn{width:1.75rem;height:1.75rem;border-radius:.5rem;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem}
+.add-child-form,.add-item-form{margin-top:.5rem;padding:.75rem;border-radius:.75rem;border:1px dashed rgba(249,115,22,.3);background:rgba(249,115,22,.05)}
+.add-child-form p{font-size:.75rem;opacity:.7;margin-bottom:.5rem}
+input[type=text],input[type=date],textarea{width:100%;padding:.5rem .75rem;border-radius:.5rem;border:1px solid rgba(249,115,22,.2);background:#fff;font-size:.875rem;margin-bottom:.5rem;outline:none}
+input:focus,textarea:focus{border-color:#f97316}
+.form-actions{display:flex;gap:.5rem}
+.form-actions button{flex:1;padding:.5rem;border-radius:.5rem;border:none;cursor:pointer;font-size:.875rem;font-weight:500}
+.btn-submit{color:#fff}
+.btn-cancel{background:rgba(249,115,22,.1);color:#f97316}
+.add-btn{width:100%;padding:.625rem;border-radius:.75rem;border:2px dashed rgba(249,115,22,.3);background:transparent;color:#f97316;cursor:pointer;font-size:.875rem;font-weight:500;transition:all .2s;margin-top:.75rem}
+.add-btn:hover{border-style:solid;background:rgba(249,115,22,.05)}
+.person-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.75rem}
+.person-card{position:relative;border-radius:.75rem;padding:.75rem;overflow:hidden;border:1px solid rgba(249,115,22,.2);background:rgba(249,115,22,.08)}
+.person-card-glow{position:absolute;top:-20px;right:-20px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,#f97316,transparent 70%);opacity:.2}
+.person-top{position:relative;display:flex;align-items:center;gap:.75rem}
+.person-avatar{width:2.5rem;height:2.5rem;border-radius:.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;background:linear-gradient(135deg,#b45309,#f97316);box-shadow:0 2px 8px rgba(249,115,22,.3);flex-shrink:0}
+.person-name{font-weight:600;font-size:.9rem}
+.person-pos{font-size:.75rem;opacity:.7;margin-top:.125rem}
+.person-actions{position:absolute;top:.5rem;right:.5rem;display:flex;gap:.25rem;opacity:0;transition:opacity .2s}
 .person-card:hover .person-actions{opacity:1}
-.btn-icon-sm{padding:0.375rem;border-radius:0.5rem;border:none;cursor:pointer;transition:transform 0.2s}
-.btn-icon-sm:hover{transform:scale(1.1)}
-.person-info{display:flex;align-items:center;gap:1rem}
-.avatar{width:48px;height:48px;background:#3b82f6;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:1rem}
-.modal-content{background:#fff;border-radius:1rem;width:100%;max-width:400px;overflow:hidden}
-.modal-header{background:#1e3a5f;color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center}
-.modal-body{padding:1rem}
-.form-group{margin-bottom:1rem}
-.form-label{display:block;font-weight:500;margin-bottom:0.25rem;color:#475569}
-.form-input{width:100%;padding:0.75rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:1rem}
-.form-input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
-.modal-footer{padding:1rem;display:flex;gap:0.5rem}
-.btn-cancel{flex:1;padding:0.75rem;border-radius:0.5rem;background:#e2e8f0;color:#64748b;border:none;cursor:pointer}
-.btn-save{flex:1;padding:0.75rem;border-radius:0.5rem;background:#3b82f6;color:#fff;border:none;cursor:pointer}
-.theme-btn{display:block;width:100%;padding:1rem;border-radius:0.5rem;border:2px solid transparent;margin-bottom:0.5rem;cursor:pointer;font-weight:500;transition:all 0.2s}
-.theme-btn.active{border-color:#3b82f6;transform:scale(1.02)}
-.hidden{display:none}
-@media(max-width:640px){.hidden-mobile{display:none!important}}
+.person-contact{position:relative;font-size:.75rem;opacity:.8;margin-top:.5rem;padding-top:.5rem;border-top:1px solid rgba(249,115,22,.15);display:flex;align-items:center;gap:.25rem}
+.empty-text{text-align:center;padding:1.5rem;border-radius:.75rem;font-size:.875rem;opacity:.5}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:100;padding:1rem}
+.modal-box{width:100%;max-width:420px;border-radius:1rem;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.modal-head{padding:1rem 1.5rem;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:1.125rem;font-weight:700}
+.modal-close{background:none;border:none;color:#fff;opacity:.8;cursor:pointer;font-size:1.25rem}
+.modal-body{padding:1.5rem}
+.modal-body h4{font-size:.95rem;font-weight:600;margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0}
+.switch{position:relative;width:2.75rem;height:1.5rem;border-radius:9999px;cursor:pointer;transition:background .2s}
+.switch-knob{position:absolute;top:2px;left:2px;width:1.05rem;height:1.05rem;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.switch.on .switch-knob{transform:translateX(20px)}
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem}
+.theme-btn{padding:.75rem;border-radius:.75rem;border:2px solid transparent;cursor:pointer;color:#fff;font-size:.875rem;font-weight:500;transition:transform .2s}
+.theme-btn:hover{transform:scale(1.05)}
+.theme-btn.active{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.3)}
+.mode-btns{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem}
+.mode-btn{padding:.75rem;border-radius:.75rem;border:2px solid;cursor:pointer;font-size:.875rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
+.slider-wrap{display:flex;align-items:center;gap:.75rem}
+.slider{flex:1;height:.5rem;border-radius:9999px;-webkit-appearance:none;appearance:none;cursor:pointer}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:1rem;height:1rem;border-radius:50%;background:#f97316;cursor:pointer}
+.slider-val{width:3rem;text-align:center;font-size:.875rem;font-weight:500}
+.modal-footer{padding:0 1.5rem 1.5rem}
+.modal-footer button{width:100%;padding:.75rem;border-radius:.75rem;border:none;color:#fff;font-weight:500;cursor:pointer;font-size:.9rem}
+footer{text-align:center;padding:.75rem 1rem;border-top:1px solid rgba(255,255,255,.5);color:rgba(120,53,15,.6);font-size:.875rem;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);margin-top:auto}
+footer a{color:#f97316;text-decoration:none}
+.hidden{display:none!important}
+@media(max-width:640px){.nav-title{font-size:1.15rem}.nav-sub{display:none}.hidden-sm{display:none!important}.card-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-const state = {
-  modules: JSON.parse(localStorage.getItem('huiliu-modules')) || [
-    {id:'1',title:'工作范围',type:'standard',items:[
-      {id:'1-1',content:'负责脱硫脱硝系统的日常运行与维护'},
-      {id:'1-2',content:'监控烟气排放指标，确保达标'},
-      {id:'1-3',content:'处理脱硫剂的制备与供应'},
-      {id:'1-4',content:'配合检修工作，完成系统消缺'}
-    ]},
-    {id:'2',title:'人员架构',type:'personnel',items:[],persons:[
-      {id:'2-1',name:'张伟',position:'班长',contact:'13800138001'},
-      {id:'2-2',name:'李强',position:'副班长',contact:'13800138002'},
-      {id:'2-3',name:'王磊',position:'操作员',contact:'13800138003'},
-      {id:'2-4',name:'赵鹏',position:'操作员',contact:'13800138004'}
-    ]},
-    {id:'3',title:'工作理念',type:'standard',items:[
-      {id:'3-1',content:'安全第一，预防为主'},
-      {id:'3-2',content:'精益求精，追求卓越'},
-      {id:'3-3',content:'团结协作，共同进步'},
-      {id:'3-4',content:'节能减排，绿色发展'}
-    ]},
-    {id:'4',title:'班前会',type:'standard',items:[
-      {id:'4-1',content:'检查人员到岗情况，确认精神状态',date:'2024-01-15'},
-      {id:'4-2',content:'通报当班任务和注意事项',date:'2024-01-15'}
-    ]},
-    {id:'5',title:'班后会',type:'standard',items:[
-      {id:'5-1',content:'总结当班工作完成情况',date:'2024-01-14'},
-      {id:'5-2',content:'汇报异常情况和处理措施',date:'2024-01-14'}
-    ]},
-    {id:'6',title:'违章记录',type:'standard',items:[
-      {id:'6-1',content:'李强：未按规定佩戴安全帽，已整改',date:'2024-01-10'}
-    ]},
-    {id:'7',title:'奖惩记录',type:'standard',items:[
-      {id:'7-1',content:'张伟：月度优秀员工，奖励500元',date:'2024-01-01'},
-      {id:'7-2',content:'班组：季度安全先进班组，奖励2000元',date:'2024-01-01'}
-    ]}
-  ],
-  themes: [
-    {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'},
-    {id:'orange',name:'活力橙',primary:'#c2410c',secondary:'#f97316',bg:'#fff7ed'},
-    {id:'green',name:'清新绿',primary:'#166534',secondary:'#22c55e',bg:'#f0fdf4'},
-    {id:'purple',name:'科技紫',primary:'#581c87',secondary:'#a855f7',bg:'#faf5ff'},
-    {id:'star',name:'星空黑',primary:'#0a0a1a',secondary:'#6366f1',bg:'#050510'}
-  ],
-  currentTheme: JSON.parse(localStorage.getItem('huiliu-theme')) || {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'},
-  activeModuleId: null,
-  sidebarOpen: false,
-  scale: 1
+const THEMES = {
+  'warm-light': {
+    name: '暖白明', primary: '#b45309', secondary: '#f97316',
+    bg: '#fffbeb', card: '#ffffff', text: '#78350f', border: 'rgba(254,215,170,.6)',
+    dark: false
+  },
+  'warm-dark': {
+    name: '暖茶暗', primary: '#451a03', secondary: '#d97706',
+    bg: '#1c1410', card: '#291f1a', text: '#fef3c7', border: 'rgba(217,119,6,.3)',
+    dark: true
+  },
+  'classic-blue': {
+    name: '经典蓝', primary: '#1e3a5f', secondary: '#3b82f6',
+    bg: '#f0f4f8', card: '#ffffff', text: '#1e293b', border: 'rgba(203,213,225,.6)',
+    dark: false
+  }
 };
+const genId = () => Math.random().toString(36).slice(2, 11);
 
-function save() {
-  localStorage.setItem('huiliu-modules', JSON.stringify(state.modules));
-  localStorage.setItem('huiliu-theme', JSON.stringify(state.currentTheme));
+const STORAGE_KEY = 'huiliu-team-simple';
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    themeId: 'warm-light',
+    settings: { scale: 1, glassEffect: true, animation: true, cardMode: 'grid' },
+    modules: [
+      {id:'1',title:'工作范围',type:'standard',items:[
+        {id:'1-1',content:'负责脱硫脱硝系统的日常运行与维护',children:[
+          {id:'1-1-1',content:'脱硫塔巡检与记录',children:[]},
+          {id:'1-1-2',content:'脱硝系统参数监控',children:[]}
+        ],collapsed:false},
+        {id:'1-2',content:'监控烟气排放指标，确保达标',children:[
+          {id:'1-2-1',content:'SO2浓度实时监测',children:[]},
+          {id:'1-2-2',content:'NOx排放数据记录',children:[]},
+          {id:'1-2-3',content:'颗粒物浓度检测',children:[]}
+        ],collapsed:false},
+        {id:'1-3',content:'处理脱硫剂的制备与供应',children:[]},
+        {id:'1-4',content:'配合检修工作，完成系统消缺',children:[]}
+      ]},
+      {id:'2',title:'人员架构',type:'personnel',items:[],persons:[
+        {id:'p1',name:'张伟',position:'班长',contact:'13800138001'},
+        {id:'p2',name:'李强',position:'副班长',contact:'13800138002'},
+        {id:'p3',name:'王磊',position:'操作员',contact:'13800138003'},
+        {id:'p4',name:'赵鹏',position:'操作员',contact:'13800138004'}
+      ]},
+      {id:'3',title:'工作理念',type:'standard',items:[
+        {id:'3-1',content:'安全第一，预防为主',children:[]},
+        {id:'3-2',content:'精益求精，追求卓越',children:[]},
+        {id:'3-3',content:'团结协作，共同进步',children:[]},
+        {id:'3-4',content:'节能减排，绿色发展',children:[]}
+      ]},
+      {id:'4',title:'班前会',type:'standard',items:[
+        {id:'4-1',content:'检查人员到岗情况，确认精神状态',date:'2024-01-15',children:[]},
+        {id:'4-2',content:'通报当班任务和注意事项',date:'2024-01-15',children:[]},
+        {id:'4-3',content:'强调安全风险点和防控措施',date:'2024-01-15',children:[]}
+      ]},
+      {id:'5',title:'班后会',type:'standard',items:[
+        {id:'5-1',content:'总结当班工作完成情况',date:'2024-01-14',children:[]},
+        {id:'5-2',content:'汇报异常情况和处理措施',date:'2024-01-14',children:[]},
+        {id:'5-3',content:'提出改进建议和注意事项',date:'2024-01-14',children:[]}
+      ]},
+      {id:'6',title:'违章记录',type:'standard',items:[
+        {id:'6-1',content:'李强：未按规定佩戴安全帽，已整改',date:'2024-01-10',children:[]}
+      ]},
+      {id:'7',title:'奖惩记录',type:'standard',items:[
+        {id:'7-1',content:'张伟：月度优秀员工，奖励500元',date:'2024-01-01',children:[]},
+        {id:'7-2',content:'班组：季度安全先进班组，奖励2000元',date:'2024-01-01',children:[]}
+      ]}
+    ],
+    expandedId: null
+  };
 }
 
-function genId() { return Math.random().toString(36).substr(2,9); }
+let state = loadState();
 
-function render() {
-  const t = state.currentTheme;
-  document.body.style.background = t.bg;
-  // 星空黑主题：添加星星背景
-  if (t.id === 'star') {
-    document.body.style.backgroundImage = `radial-gradient(2px 2px at 20px 30px, white, transparent), radial-gradient(1px 1px at 40px 70px, white, transparent), radial-gradient(1px 1px at 90px 40px, white, transparent), radial-gradient(2px 2px at 160px 120px, white, transparent), radial-gradient(1px 1px at 200px 200px, white, transparent), radial-gradient(1.5px 1.5px at 250px 80px, white, transparent), radial-gradient(1px 1px at 300px 150px, white, transparent), radial-gradient(2px 2px at 350px 250px, white, transparent)`;
-    document.body.style.backgroundSize = '400px 300px';
-    document.body.style.backgroundRepeat = 'repeat';
-  } else {
-    document.body.style.backgroundImage = '';
-  }
-
-  const isDark = t.id === 'star';
-  const glassBg = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.85)';
-  const glassBorder = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.6)';
-  const cardShadow = isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 10px 30px -10px rgba(0,0,0,0.1)';
-  const textColor = isDark ? '#e2e8f0' : '#1e293b';
-  const textMuted = isDark ? 'rgba(255,255,255,0.6)' : '#64748b';
-
-  const activeModule = state.modules.find(m => m.id === state.activeModuleId);
-
-  let html = `<div style="max-width:80rem;margin:0 auto;padding:1rem 0.75rem;min-height:calc(100vh - 0px);display:flex;flex-direction:column">`;
-
-  // 顶部导航栏
-  html += `<nav style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.25rem;margin-bottom:1.25rem;background:${isDark?'rgba(30,30,40,0.92)':'rgba(255,255,255,0.92)'};border:1px solid ${glassBorder};border-radius:1rem;box-shadow:${cardShadow};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
-    <div style="display:flex;align-items:center;gap:0.75rem">
-      <div style="width:3rem;height:3rem;border-radius:1rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.25rem;background:linear-gradient(135deg,${t.primary},${t.secondary});box-shadow:0 4px 12px ${t.secondary}40;flex-shrink:0">灰</div>
-      <div>
-        <h1 style="font-weight:700;font-size:1.5rem;line-height:1.1;color:${textColor};margin:0">灰硫班组信息</h1>
-        <p style="font-size:0.875rem;color:${textMuted};margin:0">脱硫脱硝班组管理平台</p>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:0.5rem">
-      <button onclick="showAddModule()" style="display:flex;align-items:center;gap:0.375rem;padding:0.5rem 0.75rem;border-radius:0.5rem;color:#fff;font-size:0.875rem;font-weight:500;border:none;cursor:pointer;background:linear-gradient(135deg,${t.primary},${t.secondary});box-shadow:0 4px 12px ${t.secondary}40;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">+ <span class="hidden-mobile">添加大项</span></button>
-      <button onclick="showThemes()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" title="切换皮肤">${isDark?'🌙':'🎨'}</button>
-      <button onclick="exportData()" class="btn-icon-sm hidden-mobile" style="background:${t.secondary}20;color:${t.secondary}" title="导出数据">⬇</button>
-      <label class="btn-icon-sm hidden-mobile" style="background:${t.secondary}20;color:${t.secondary};cursor:pointer" title="导入数据">⬆<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
-    </div>
-  </nav>`;
-
-  // page-header
-  const scale = state.scale;
-  html += `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.75rem 1.5rem;margin-bottom:1.25rem;background:${glassBg};border:1px solid ${glassBorder};border-radius:1rem;box-shadow:${cardShadow};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
-    <div style="display:flex;align-items:center;gap:0.5rem">`;
-  if (activeModule) {
-    html += `<button onclick="backToList()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" title="返回总览">←</button>`;
-    const icon = activeModule.type === 'personnel' ? '👥' : '📋';
-    html += `<h2 style="font-size:1.25rem;font-weight:700;color:${textColor};margin:0;display:flex;align-items:center;gap:0.5rem">${icon} ${activeModule.title}</h2>`;
-    const cnt = activeModule.type === 'personnel' ? (activeModule.persons||[]).length + ' 人' : activeModule.items.length + ' 项';
-    html += `<span style="font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:0.375rem;font-weight:500;background:${t.secondary}20;color:${t.secondary}">${cnt}</span>`;
-  } else {
-    html += `<h2 style="font-size:1.25rem;font-weight:700;color:${textColor};margin:0;display:flex;align-items:center;gap:0.5rem">📋 模块总览</h2><span style="font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:0.375rem;font-weight:500;background:${t.secondary}20;color:${t.secondary}">共 ${state.modules.length} 个</span>`;
-  }
-  html += `</div>`;
-  if (!activeModule) {
-    html += `<div style="display:flex;align-items:center;gap:0.5rem">
-      <button onclick="zoomOut()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" ${scale <= 0.7 ? 'disabled' : ''}>－</button>
-      <span style="font-size:0.875rem;font-weight:500;width:3rem;text-align:center;color:${textColor}">${Math.round(scale*100)}%</span>
-      <button onclick="zoomIn()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" ${scale >= 1.5 ? 'disabled' : ''}>＋</button>
-    </div>`;
-  }
-  html += `</div>`;
-
-  // 主内容区
-  html += `<div style="flex:1">`;
-  if (activeModule) {
-    const m = activeModule;
-    const icon = m.type === 'personnel' ? '👥' : '📋';
-    html += `<div class="card" style="background:${glassBg};border:1px solid ${glassBorder};border-radius:1rem;box-shadow:${cardShadow};overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
-      <div style="padding:0.75rem 1rem;background:${isDark?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.5)'};border-bottom:1px solid ${glassBorder};display:flex;align-items:center;justify-content:space-between">
-        <h2 style="font-size:1.25rem;font-weight:600;color:${textColor};margin:0">${icon} ${m.title}</h2>
-        <button class="btn-icon-sm" style="background:rgba(239,68,68,0.15);color:#ef4444" onclick="deleteModule('${m.id}')">🗑</button>
-      </div>
-      <div style="padding:1rem">`;
-    if (m.type === 'personnel') {
-      (m.persons || []).forEach(p => {
-        const pGlassBg = isDark ? 'rgba(255,255,255,0.08)' : t.secondary + '14';
-        const pGlassBorder = isDark ? 'rgba(255,255,255,0.15)' : t.secondary + '40';
-        html += `<div class="person-card" style="background:${pGlassBg};border:1px solid ${pGlassBorder}">
-          <div class="person-card-glow" style="background:radial-gradient(circle, ${t.secondary}, transparent 70%)"></div>
-          <div style="position:relative;display:flex;align-items:center;justify-content:space-between">
-            <div class="person-info" style="gap:0.75rem">
-              <div class="person-avatar" style="background:linear-gradient(135deg, ${t.secondary}, ${t.primary});box-shadow:0 2px 8px ${t.secondary}50">${p.name.charAt(0)}</div>
-              <div>
-                <div style="font-weight:600;color:${textColor}">${p.name}</div>
-                <div style="font-size:0.75rem;color:${textColor};opacity:0.7;margin-top:0.125rem">${p.position}</div>
-              </div>
-            </div>
-            <div class="person-actions">
-              <button class="btn-icon-sm" style="background:${isDark?'rgba(255,255,255,0.1)':t.secondary+'20'};color:${isDark?'#fff':t.secondary}" onclick="deletePerson('${m.id}','${p.id}')">✎</button>
-              <button class="btn-icon-sm" style="background:rgba(239,68,68,0.15);color:#ef4444" onclick="deletePerson('${m.id}','${p.id}')">🗑</button>
-            </div>
-          </div>
-          <div style="position:relative;display:flex;align-items:center;gap:0.375rem;font-size:0.75rem;padding-top:0.5rem;margin-top:0.5rem;border-top:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'};color:${textColor};opacity:0.8">📞 ${p.contact}</div>
-        </div>`;
-      });
-      html += `<button class="btn-add" onclick="showAddPerson('${m.id}')">+ 添加人员</button>`;
-    } else {
-      m.items.forEach(item => {
-        html += `<div class="item"><div>${item.content}${item.date ? `<span style="font-size:0.75rem;color:${textMuted};margin-left:0.5rem">${item.date}</span>` : ''}</div></div>`;
-      });
-      html += `<button class="btn-add" onclick="showAddItem('${m.id}')">+ 添加子项</button>`;
-    }
-    html += `</div></div>`;
-  } else if (state.modules.length === 0) {
-    html += `<div style="text-align:center;padding:4rem 1rem;border-radius:1rem;background:${glassBg};border:1px solid ${glassBorder};color:${textMuted}">暂无模块，请点击右上角"添加大项"</div>`;
-  } else {
-    const cardW = 210 * scale;
-    const cardH = 150 * scale;
-    html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(${cardW}px,1fr));gap:1rem">`;
-    state.modules.forEach(m => {
-      const icon = m.type === 'personnel' ? '👥' : '📋';
-      const count = m.type === 'personnel' ? (m.persons || []).length : m.items.length;
-      const countLabel = m.type === 'personnel' ? '成员' : '条目';
-      html += `<button onclick="selectModule('${m.id}')" style="position:relative;height:${cardH}px;background:${glassBg};border:1px solid ${glassBorder};border-radius:1rem;cursor:pointer;overflow:hidden;color:${textColor};text-align:left;padding:${0.75*scale}rem;transition:all 0.3s;box-shadow:${cardShadow};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='${cardShadow}'">
-        <div style="position:absolute;top:0;left:0;right:0;height:0.375rem;background:linear-gradient(90deg,${t.primary},${t.secondary})"></div>
-        <div style="position:absolute;top:-1.5rem;right:-1.5rem;width:6rem;height:6rem;border-radius:50%;background:radial-gradient(circle,${t.secondary},transparent 70%);opacity:0.2"></div>
-        <div style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between">
-            <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.25rem;background:linear-gradient(135deg,${t.primary},${t.secondary});box-shadow:0 2px 8px ${t.secondary}40">${icon}</div>
-            <span style="font-size:${0.7*scale}rem;padding:0.15rem 0.5rem;border-radius:0.375rem;font-weight:500;background:${t.secondary}20;color:${t.secondary}">${m.type === 'personnel' ? '人员' : '内容'}</span>
-          </div>
-          <div>
-            <div style="font-weight:700;font-size:${1.05*scale}rem;line-height:1.2;margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${textColor}">${m.title}</div>
-            <div style="font-size:${0.75*scale}rem;color:${textMuted}">${count} 个${countLabel}</div>
-          </div>
-        </div>
-      </button>`;
-    });
-    html += `</div>`;
-  }
-  html += `</div>`;
-
-  // 吸底 footer
-  html += `<footer style="text-align:center;padding:0.75rem 1rem;margin-top:1.5rem;border-top:1px solid ${glassBorder};background:${glassBg};color:${textMuted};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
-    <p style="font-size:0.875rem;margin:0;display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap">
-      <span>Copyright © 2026 灰硫班组信息</span>
-      <a href="https://github.com/sljqcm/huiliu_team_info" target="_blank" style="display:flex;align-items:center;gap:0.25rem;color:${t.secondary};text-decoration:none" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">⌂ GitHub Repository</a>
-    </p>
-  </footer>`;
-
-  html += `</div>`;
-  document.getElementById('app').innerHTML = html;
-  document.body.style.background = t.bg;
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    themeId: state.themeId,
+    settings: state.settings,
+    modules: state.modules
+  }));
 }
 
-function selectModule(id) {
-  state.activeModuleId = id;
-  render();
-}
+function t() { return THEMES[state.themeId]; }
 
-function backToList() {
-  state.activeModuleId = null;
-  render();
-}
+function setTheme(id) { state.themeId = id; saveState(); render(); }
+function updateSettings(patch) { state.settings = { ...state.settings, ...patch }; saveState(); render(); }
 
-function zoomIn() {
-  state.scale = Math.min(1.5, state.scale + 0.1);
-  render();
+function addModule(title, type) {
+  state.modules.push({ id: genId(), title, type, items: [], persons: type==='personnel'?[]:undefined });
+  saveState(); render();
 }
-
-function zoomOut() {
-  state.scale = Math.max(0.7, state.scale - 0.1);
-  render();
-}
-
-function showThemes() {
-  const t = state.currentTheme;
-  let html = `<div class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header" style="background:${t.primary}">
-        <h3>选择皮肤</h3>
-        <button class="btn-icon" style="background:transparent;color:#fff" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">`;
-  
-  state.themes.forEach(th => {
-    const active = th.id === state.currentTheme.id ? 'active' : '';
-    html += `<button class="theme-btn ${active}" style="background:${th.bg};color:${th.primary}" onclick="setTheme('${th.id}')">${th.name}</button>`;
-  });
-  
-  html += `</div></div></div>`;
-  document.getElementById('app').innerHTML = html;
-}
-
-function setTheme(id) {
-  state.currentTheme = state.themes.find(t => t.id === id);
-  save();
-  render();
-}
-
-function showAddModule() {
-  const t = state.currentTheme;
-  const html = `<div class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header" style="background:${t.primary}">
-        <h3>添加大项</h3>
-        <button class="btn-icon" style="background:transparent;color:#fff" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">名称</label>
-          <input type="text" id="moduleTitle" class="form-input" placeholder="请输入大项名称">
-        </div>
-        <div class="form-group">
-          <label class="form-label">类型</label>
-          <select id="moduleType" class="form-input">
-            <option value="standard">普通模块</option>
-            <option value="personnel">人员模块</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal()">取消</button>
-        <button class="btn-save" style="background:${t.secondary}" onclick="addModule()">添加</button>
-      </div>
-    </div>
-  </div>`;
-  document.getElementById('app').innerHTML = html;
-}
-
-function addModule() {
-  const title = document.getElementById('moduleTitle').value.trim();
-  const type = document.getElementById('moduleType').value;
-  if (!title) return;
-  state.modules.push({id:genId(),title,type,items:[],persons:type==='personnel'?[]:undefined});
-  save();
-  render();
-}
-
 function deleteModule(id) {
-  if (confirm('确定删除此模块？')) {
-    state.modules = state.modules.filter(m => m.id !== id);
-    if (state.activeModuleId === id) {
-      state.activeModuleId = state.modules.length > 0 ? state.modules[0].id : null;
-    }
-    save();
-    render();
-  }
+  if(!confirm('确定删除整个模块？')) return;
+  state.modules = state.modules.filter(m => m.id !== id);
+  if(state.expandedId === id) state.expandedId = null;
+  saveState(); render();
 }
 
-function showAddItem(moduleId) {
-  const t = state.currentTheme;
-  const html = `<div class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header" style="background:${t.primary}">
-        <h3>添加子项</h3>
-        <button class="btn-icon" style="background:transparent;color:#fff" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">内容</label>
-          <textarea id="itemContent" class="form-input" rows="3" placeholder="请输入内容"></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">日期（可选）</label>
-          <input type="date" id="itemDate" class="form-input">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal()">取消</button>
-        <button class="btn-save" style="background:${t.secondary}" onclick="addItem('${moduleId}')">添加</button>
-      </div>
-    </div>
-  </div>`;
-  document.getElementById('app').innerHTML = html;
+function addSubItemToTree(items, parentId, newItem) {
+  if(parentId === null) return [...items, newItem];
+  return items.map(item => {
+    if(item.id === parentId) return { ...item, children: [...(item.children||[]), newItem], collapsed: false };
+    if(item.children) return { ...item, children: addSubItemToTree(item.children, parentId, newItem) };
+    return item;
+  });
+}
+function deleteSubItemFromTree(items, itemId) {
+  return items.filter(i => i.id !== itemId).map(i => i.children ? { ...i, children: deleteSubItemFromTree(i.children, itemId) } : i);
+}
+function updateSubItemInTree(items, itemId, patch) {
+  return items.map(i => {
+    if(i.id === itemId) return { ...i, ...patch };
+    if(i.children) return { ...i, children: updateSubItemInTree(i.children, itemId, patch) };
+    return i;
+  });
+}
+function toggleSubItemInTree(items, itemId) {
+  return items.map(i => {
+    if(i.id === itemId) return { ...i, collapsed: !i.collapsed };
+    if(i.children) return { ...i, children: toggleSubItemInTree(i.children, itemId) };
+    return i;
+  });
 }
 
-function addItem(moduleId) {
-  const content = document.getElementById('itemContent').value.trim();
-  const date = document.getElementById('itemDate').value;
-  if (!content) return;
-  const m = state.modules.find(m => m.id === moduleId);
-  if (m) {
-    m.items.push({id:genId(),content,date:date||undefined});
-    save();
-  }
-  render();
+function addSubItem(moduleId, parentId, content, date) {
+  const mod = state.modules.find(m => m.id === moduleId);
+  if(!mod || !content.trim()) return;
+  const newItem = { id: genId(), content: content.trim(), children: [] };
+  if(date) newItem.date = date;
+  mod.items = addSubItemToTree(mod.items, parentId, newItem);
+  saveState(); render();
+}
+function deleteSubItem(moduleId, itemId) {
+  if(!confirm('确定删除该项及其子项？')) return;
+  const mod = state.modules.find(m => m.id === moduleId);
+  if(!mod) return;
+  mod.items = deleteSubItemFromTree(mod.items, itemId);
+  saveState(); render();
+}
+function toggleSubItem(moduleId, itemId) {
+  const mod = state.modules.find(m => m.id === moduleId);
+  if(!mod) return;
+  mod.items = toggleSubItemInTree(mod.items, itemId);
+  saveState();
+  // 只更新该模块内容，不重渲染整个页面
+  const bodyEl = document.querySelector(`[data-module-body="${moduleId}"]`);
+  if(bodyEl) bodyEl.innerHTML = renderModuleBody(mod);
 }
 
-function showAddPerson(moduleId) {
-  const t = state.currentTheme;
-  const html = `<div class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-      <div class="modal-header" style="background:${t.primary}">
-        <h3>添加人员</h3>
-        <button class="btn-icon" style="background:transparent;color:#fff" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label class="form-label">姓名</label>
-          <input type="text" id="personName" class="form-input" placeholder="请输入姓名">
-        </div>
-        <div class="form-group">
-          <label class="form-label">职位</label>
-          <input type="text" id="personPosition" class="form-input" placeholder="请输入职位">
-        </div>
-        <div class="form-group">
-          <label class="form-label">联系方式</label>
-          <input type="text" id="personContact" class="form-input" placeholder="请输入联系方式">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal()">取消</button>
-        <button class="btn-save" style="background:${t.secondary}" onclick="addPerson('${moduleId}')">添加</button>
-      </div>
-    </div>
-  </div>`;
-  document.getElementById('app').innerHTML = html;
+function addPerson(moduleId, name, position, contact) {
+  const mod = state.modules.find(m => m.id === moduleId);
+  if(!mod || !name.trim()) return;
+  mod.persons.push({ id: genId(), name: name.trim(), position: position.trim(), contact: contact.trim() });
+  saveState(); render();
 }
-
-function addPerson(moduleId) {
-  const name = document.getElementById('personName').value.trim();
-  const position = document.getElementById('personPosition').value.trim();
-  const contact = document.getElementById('personContact').value.trim();
-  if (!name) return;
-  const m = state.modules.find(m => m.id === moduleId);
-  if (m) {
-    if (!m.persons) m.persons = [];
-    m.persons.push({id:genId(),name,position,contact});
-    save();
-  }
-  render();
-}
-
 function deletePerson(moduleId, personId) {
-  const m = state.modules.find(m => m.id === moduleId);
-  if (m && m.persons) {
-    m.persons = m.persons.filter(p => p.id !== personId);
-    save();
-    render();
-  }
+  if(!confirm('确定删除该人员？')) return;
+  const mod = state.modules.find(m => m.id === moduleId);
+  if(!mod) return;
+  mod.persons = mod.persons.filter(p => p.id !== personId);
+  saveState(); render();
 }
 
-function closeModal(e) {
-  if (!e || e.target.classList.contains('modal')) render();
+function toggleModule(id) {
+  state.expandedId = state.expandedId === id ? null : id;
+  saveState();
+  render();
 }
 
 function exportData() {
-  const data = {
-    version: 1,
-    exportDate: new Date().toISOString(),
-    modules: state.modules,
-    currentThemeId: state.currentTheme.id
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const data = { modules: state.modules, currentThemeId: state.themeId, settings: state.settings };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const dateStr = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
-  a.download = '灰硫班组信息_' + dateStr + '.json';
-  document.body.appendChild(a);
+  a.download = `huiliu-team-${new Date().toISOString().split('T')[0]}.json`;
   a.click();
-  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-
 function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
+  const file = e.target.files?.[0];
+  if(!file) return;
   const reader = new FileReader();
-  reader.onload = function(ev) {
+  reader.onload = ev => {
     try {
       const data = JSON.parse(ev.target.result);
-      if (data.modules && Array.isArray(data.modules)) {
-        state.modules = data.modules;
-        if (data.currentThemeId) {
-          const th = state.themes.find(t => t.id === data.currentThemeId);
-          if (th) state.currentTheme = th;
-        }
-        save();
-        render();
-        alert('导入成功！');
-      } else {
-        alert('文件格式不正确');
-      }
-    } catch(err) {
-      alert('文件解析失败，请确认是有效的JSON文件');
+      if(data.modules) state.modules = data.modules;
+      if(data.currentThemeId && THEMES[data.currentThemeId]) state.themeId = data.currentThemeId;
+      if(data.settings) state.settings = { ...state.settings, ...data.settings };
+      saveState();
+      render();
+      alert('导入成功！');
+    } catch {
+      alert('导入失败：文件格式错误');
     }
   };
   reader.readAsText(file);
   e.target.value = '';
+}
+
+function renderSubItem(item, moduleId, depth = 0) {
+  const th = t();
+  const hasChildren = item.children && item.children.length > 0;
+  const isCollapsed = item.collapsed;
+  let html = `<div class="item-block" style="margin-left:${depth*24}px;background:${th.dark?'rgba(255,255,255,.05)':th.secondary+'0a'};border:1px solid ${th.dark?'rgba(255,255,255,.1)':th.secondary+'30'}">`;
+  if(hasChildren) {
+    html += `<button class="item-expand" style="background:${th.secondary}20;color:${th.secondary}" onclick="event.stopPropagation();toggleSubItem('${moduleId}','${item.id}')">${isCollapsed?'▶':'▼'}</button>`;
+  } else {
+    html += `<div class="item-dot" style="background:${th.secondary}"></div>`;
+  }
+  html += `<div class="item-content" style="color:${th.text}">
+    <div class="item-text">${item.content}</div>
+    ${item.date ? `<div class="item-date">📅 ${item.date}</div>` : ''}
+  </div>`;
+  html += `<div class="item-actions">
+    <button class="item-btn" style="background:${th.secondary}20;color:${th.secondary}" onclick="event.stopPropagation();openAddChild('${moduleId}','${item.id}')" title="添加子项">+</button>
+    <button class="item-btn" style="background:rgba(239,68,68,.15);color:#ef4444" onclick="event.stopPropagation();deleteSubItem('${moduleId}','${item.id}')" title="删除">🗑</button>
+  </div>`;
+  html += `</div>`;
+  // 添加子项表单
+  if(state.addingChild?.moduleId === moduleId && state.addingChild?.parentId === item.id) {
+    html += `<div class="add-child-form" style="margin-left:${depth*24}px">
+      <p style="color:${th.text}">添加子子项到：${item.content}</p>
+      <input type="text" id="addChildInput" placeholder="输入内容..." onkeydown="if(event.key==='Enter')doAddChild('${moduleId}','${item.id}')">
+      <input type="date" id="addChildDate">
+      <div class="form-actions">
+        <button class="btn-submit" style="background:${th.secondary}" onclick="doAddChild('${moduleId}','${item.id}')">添加</button>
+        <button class="btn-cancel" onclick="closeAddChild()">取消</button>
+      </div>
+    </div>`;
+  }
+  // 子子项
+  if(hasChildren && !isCollapsed) {
+    html += `<div style="margin-top:.5rem;display:flex;flex-direction:column;gap:.5rem">`;
+    item.children.forEach(child => {
+      html += renderSubItem(child, moduleId, depth + 1);
+    });
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderModuleBody(mod) {
+  const th = t();
+  let html = '';
+  if(mod.type === 'standard') {
+    if(mod.items.length === 0) {
+      html += `<div class="empty-text" style="background:${th.dark?'rgba(255,255,255,.03)':th.secondary+'05'};color:${th.text}50">暂无子项，点击下方按钮添加</div>`;
+    } else {
+      html += `<div class="item-list">`;
+      mod.items.forEach(item => { html += renderSubItem(item, mod.id, 0); });
+      html += `</div>`;
+    }
+    html += `<button class="add-btn" onclick="showAddItem('${mod.id}')">＋ 添加子项</button>`;
+    if(state.addItemModuleId === mod.id) {
+      html += `<div class="add-item-form">
+        <input type="text" id="addItemInput" placeholder="输入子项内容..." onkeydown="if(event.key==='Enter')doAddItem('${mod.id}')">
+        <input type="date" id="addItemDate">
+        <div class="form-actions">
+          <button class="btn-submit" style="background:${th.secondary}" onclick="doAddItem('${mod.id}')">添加</button>
+          <button class="btn-cancel" onclick="closeAddItem()">取消</button>
+        </div>
+      </div>`;
+    }
+  } else {
+    const persons = mod.persons || [];
+    if(persons.length === 0) {
+      html += `<div class="empty-text" style="background:${th.dark?'rgba(255,255,255,.03)':th.secondary+'05'};color:${th.text}50">暂无人员，点击下方按钮添加</div>`;
+    } else {
+      html += `<div class="person-grid">`;
+      persons.forEach(p => {
+        html += `<div class="person-card">
+          <div class="person-card-glow"></div>
+          <div class="person-actions">
+            <button class="item-btn" style="background:rgba(239,68,68,.15);color:#ef4444" onclick="deletePerson('${mod.id}','${p.id}')">🗑</button>
+          </div>
+          <div class="person-top">
+            <div class="person-avatar">${p.name.charAt(0)}</div>
+            <div>
+              <div class="person-name" style="color:${th.text}">${p.name}</div>
+              <div class="person-pos" style="color:${th.text}">${p.position}</div>
+            </div>
+          </div>
+          <div class="person-contact" style="color:${th.text}">📞 ${p.contact}</div>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+    html += `<button class="add-btn" onclick="showAddPerson('${mod.id}')">＋ 添加人员</button>`;
+    if(state.addPersonModuleId === mod.id) {
+      html += `<div class="add-item-form">
+        <input type="text" id="addPersonName" placeholder="姓名">
+        <input type="text" id="addPersonPos" placeholder="职位">
+        <input type="text" id="addPersonContact" placeholder="联系方式">
+        <div class="form-actions">
+          <button class="btn-submit" style="background:${th.secondary}" onclick="doAddPerson('${mod.id}')">添加</button>
+          <button class="btn-cancel" onclick="closeAddPerson()">取消</button>
+        </div>
+      </div>`;
+    }
+  }
+  return html;
+}
+
+function showAddItem(moduleId) { state.addItemModuleId = moduleId; render(); }
+function closeAddItem() { state.addItemModuleId = null; render(); }
+function doAddItem(moduleId) {
+  const content = document.getElementById('addItemInput')?.value || '';
+  const date = document.getElementById('addItemDate')?.value || '';
+  addSubItem(moduleId, null, content, date);
+  state.addItemModuleId = null;
+  render();
+}
+
+function openAddChild(moduleId, parentId) { state.addingChild = { moduleId, parentId }; render(); setTimeout(()=>document.getElementById('addChildInput')?.focus(),0); }
+function closeAddChild() { state.addingChild = null; render(); }
+function doAddChild(moduleId, parentId) {
+  const content = document.getElementById('addChildInput')?.value || '';
+  const date = document.getElementById('addChildDate')?.value || '';
+  addSubItem(moduleId, parentId, content, date);
+  state.addingChild = null;
+  render();
+}
+
+function showAddPerson(moduleId) { state.addPersonModuleId = moduleId; render(); }
+function closeAddPerson() { state.addPersonModuleId = null; render(); }
+function doAddPerson(moduleId) {
+  const name = document.getElementById('addPersonName')?.value || '';
+  const pos = document.getElementById('addPersonPos')?.value || '';
+  const contact = document.getElementById('addPersonContact')?.value || '';
+  addPerson(moduleId, name, pos, contact);
+  state.addPersonModuleId = null;
+  render();
+}
+
+function showAddModule() { state.showAddMod = true; render(); }
+function closeAddModule() { state.showAddMod = false; render(); }
+function doAddModule(type) {
+  const input = document.getElementById('addModInput');
+  const title = input?.value?.trim();
+  if(!title) return;
+  addModule(title, type);
+  state.showAddMod = false;
+  render();
+}
+
+function showSettings() { state.showSettings = true; render(); }
+function closeSettings() { state.showSettings = false; render(); }
+
+function render() {
+  const th = t();
+  document.body.style.background = th.bg;
+  document.body.style.color = th.text;
+
+  const s = state.settings;
+  const cardW = 260 * s.scale;
+  const listMode = s.cardMode === 'list';
+
+  let html = `<div class="container">
+    <nav class="navbar" style="background:${th.dark?'rgba(30,24,20,.92)':'rgba(255,255,255,.92)'};border-color:${th.border}">
+      <div class="nav-logo">
+        <div class="logo-box" style="background:linear-gradient(135deg,${th.primary},${th.secondary})">灰</div>
+        <div>
+          <div class="nav-title" style="color:${th.text}">灰硫班组信息</div>
+          <div class="nav-sub" style="color:${th.text}">脱硫脱硝班组管理平台</div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button class="btn btn-primary" style="background:linear-gradient(135deg,${th.primary},${th.secondary})" onclick="showAddModule()">＋ <span class="hidden-sm">添加大项</span></button>
+        <button class="btn btn-icon" style="background:${th.secondary}20;color:${th.secondary}" onclick="showSettings()" title="设置">⚙</button>
+        <button class="btn btn-icon hidden-sm" style="background:${th.secondary}20;color:${th.secondary}" onclick="exportData()" title="导出数据">⬇</button>
+        <label class="btn btn-icon hidden-sm" style="background:${th.secondary}20;color:${th.secondary};cursor:pointer" title="导入数据">
+          ⬆<input type="file" accept=".json" style="display:none" onchange="importData(event)">
+        </label>
+      </div>
+    </nav>
+
+    <div class="page-header" style="background:${th.dark?'rgba(255,255,255,.08)':'rgba(255,255,255,.85)'};border-color:${th.border}">
+      <div class="page-title" style="color:${th.text}">
+        📋 模块总览
+        <span class="badge" style="background:${th.secondary}20;color:${th.secondary}">共 ${state.modules.length} 个</span>
+      </div>
+      <div style="font-size:.875rem;opacity:.6;color:${th.text}">点击卡片展开查看详情</div>
+    </div>
+
+    <div class="${listMode ? 'card-list' : 'card-grid'}" style="${listMode ? '' : `grid-template-columns:repeat(auto-fill,minmax(${cardW}px,1fr))`}">`;
+
+  state.modules.forEach(mod => {
+    const isExpanded = state.expandedId === mod.id;
+    const count = mod.type === 'personnel' ? (mod.persons||[]).length : mod.items.length;
+    const icon = mod.type === 'personnel' ? '👥' : '📋';
+    const label = mod.type === 'personnel' ? '人员' : '内容';
+    const countLabel = mod.type === 'personnel' ? '成员' : '条目';
+
+    html += `<div class="module-card ${isExpanded?'expanded':''}" style="background:${th.dark?'rgba(255,255,255,.08)':'rgba(255,255,255,.85)'};border-color:${th.border}" onclick="toggleModule('${mod.id}')">
+      <div class="card-head">
+        <div class="card-topbar" style="background:linear-gradient(90deg,${th.primary},${th.secondary})"></div>
+        <div class="card-glow" style="background:radial-gradient(circle,${th.secondary},transparent 70%)"></div>
+        <div class="card-head-inner">
+          <div style="display:flex;align-items:center;gap:.75rem;min-width:0;flex:1">
+            <div class="card-icon-box" style="background:linear-gradient(135deg,${th.primary},${th.secondary})">${icon}</div>
+            <div class="card-info">
+              <div class="card-title" style="color:${th.text}">${mod.title}</div>
+              <div class="card-count" style="color:${th.text}">${count} 个${countLabel}</div>
+            </div>
+          </div>
+          <div class="card-right">
+            <span class="badge" style="background:${th.secondary}20;color:${th.secondary}">${label}</span>
+            <div class="chevron ${isExpanded?'open':''}" style="color:${th.secondary};font-size:1rem">▼</div>
+          </div>
+        </div>
+      </div>
+      ${isExpanded ? `<div class="card-body" data-module-body="${mod.id}" style="border-color:${th.border}">${renderModuleBody(mod)}</div>` : ''}
+    </div>`;
+  });
+
+  html += `</div></div>`;
+
+  // 页脚
+  html += `<footer style="border-color:${th.border};background:${th.dark?'rgba(255,255,255,.05)':'rgba(255,255,255,.85)'};color:${th.text}80">
+    Copyright © 2026 灰硫班组信息 |
+    <a href="https://github.com/sljqcm/huiliu_team_info" target="_blank">GitHub Repository</a>
+  </footer>`;
+
+  // 添加模块弹窗
+  if(state.showAddMod) {
+    html += `<div class="modal" onclick="if(event.target===this)closeAddModule()">
+      <div class="modal-box" style="background:${th.card}">
+        <div class="modal-head" style="background:linear-gradient(135deg,${th.primary},${th.secondary})">
+          <div class="modal-title">添加大项</div>
+          <button class="modal-close" onclick="closeAddModule()">✕</button>
+        </div>
+        <div class="modal-body">
+          <input type="text" id="addModInput" placeholder="输入模块名称..." onkeydown="if(event.key==='Enter')doAddModule('standard')" style="background:${th.dark?'rgba(255,255,255,.05)':'#f8fafc'};border-color:${th.border};color:${th.text}">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.5rem">
+            <button class="btn-submit" style="background:${th.secondary};padding:.75rem;border-radius:.75rem;color:#fff;border:none;cursor:pointer;font-weight:500" onclick="doAddModule('standard')">📋 内容模块</button>
+            <button class="btn-submit" style="background:${th.secondary};padding:.75rem;border-radius:.75rem;color:#fff;border:none;cursor:pointer;font-weight:500" onclick="doAddModule('personnel')">👥 人员模块</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // 设置弹窗
+  if(state.showSettings) {
+    html += `<div class="modal" onclick="if(event.target===this)closeSettings()">
+      <div class="modal-box" style="background:${th.card}">
+        <div class="modal-head" style="background:linear-gradient(135deg,${th.primary},${th.secondary})">
+          <div class="modal-title">设置</div>
+          <button class="modal-close" onclick="closeSettings()">✕</button>
+        </div>
+        <div class="modal-body" style="color:${th.text}">
+          <h4>🎨 主题选择</h4>
+          <div class="theme-grid">`;
+    Object.entries(THEMES).forEach(([id, theme]) => {
+      html += `<button class="theme-btn ${state.themeId===id?'active':''}" style="background:linear-gradient(135deg,${theme.primary},${theme.secondary})" onclick="setTheme('${id}')">${theme.name}</button>`;
+    });
+    html += `</div>
+          <h4>📐 面板模式</h4>
+          <div class="mode-btns">
+            <button class="mode-btn" style="border-color:${s.cardMode==='grid'?th.secondary:th.border};background:${s.cardMode==='grid'?th.secondary+'15':'transparent'};color:${th.text}" onclick="updateSettings({cardMode:'grid'})">⊞ 网格布局</button>
+            <button class="mode-btn" style="border-color:${s.cardMode==='list'?th.secondary:th.border};background:${s.cardMode==='list'?th.secondary+'15':'transparent'};color:${th.text}" onclick="updateSettings({cardMode:'list'})">≡ 列表布局</button>
+          </div>
+          <h4>🔍 卡片大小</h4>
+          <div class="slider-wrap">
+            <span style="font-size:.8rem;opacity:.6">小</span>
+            <input type="range" class="slider" min="0.7" max="1.5" step="0.1" value="${s.scale}" oninput="updateSettings({scale:parseFloat(this.value)})" style="background:${th.border}">
+            <span style="font-size:.8rem;opacity:.6">大</span>
+            <span class="slider-val" style="color:${th.secondary}">${Math.round(s.scale*100)}%</span>
+          </div>
+          <h4 style="margin-top:1rem">✨ 视觉效果</h4>
+          <div class="setting-row">
+            <span style="font-size:.9rem">毛玻璃效果</span>
+            <div class="switch ${s.glassEffect?'on':''}" style="background:${s.glassEffect?th.secondary:th.border}" onclick="updateSettings({glassEffect:!${s.glassEffect}})">
+              <div class="switch-knob"></div>
+            </div>
+          </div>
+          <div class="setting-row">
+            <span style="font-size:.9rem">动画效果</span>
+            <div class="switch ${s.animation?'on':''}" style="background:${s.animation?th.secondary:th.border}" onclick="updateSettings({animation:!${s.animation}})">
+              <div class="switch-knob"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button style="background:linear-gradient(135deg,${th.primary},${th.secondary})" onclick="closeSettings()">完成</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('app').innerHTML = html;
 }
 
 render();

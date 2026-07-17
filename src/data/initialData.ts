@@ -6,8 +6,15 @@ export const initialModules: Module[] = [
     title: '工作范围',
     type: 'standard',
     items: [
-      { id: '1-1', content: '负责脱硫脱硝系统的日常运行与维护' },
-      { id: '1-2', content: '监控烟气排放指标，确保达标' },
+      { id: '1-1', content: '负责脱硫脱硝系统的日常运行与维护', children: [
+        { id: '1-1-1', content: '脱硫塔巡检与记录' },
+        { id: '1-1-2', content: '脱硝系统参数监控' },
+      ]},
+      { id: '1-2', content: '监控烟气排放指标，确保达标', children: [
+        { id: '1-2-1', content: 'SO2浓度实时监测' },
+        { id: '1-2-2', content: 'NOx排放数据记录' },
+        { id: '1-2-3', content: '颗粒物浓度检测' },
+      ]},
       { id: '1-3', content: '处理脱硫剂的制备与供应' },
       { id: '1-4', content: '配合检修工作，完成系统消缺' },
     ],
@@ -76,60 +83,52 @@ export const initialModules: Module[] = [
 
 export const themes: Theme[] = [
   {
-    id: 'industrial-blue',
-    name: '工业蓝',
+    id: 'warm-light',
+    name: '暖白明',
+    primaryColor: '#b45309',
+    secondaryColor: '#f97316',
+    backgroundColor: '#fffbeb',
+    cardBackgroundColor: '#ffffff',
+    textColor: '#78350f',
+    borderColor: '#fed7aa',
+    buttonHoverColor: '#ea580c',
+  },
+  {
+    id: 'warm-dark',
+    name: '暖茶暗',
+    primaryColor: '#451a03',
+    secondaryColor: '#d97706',
+    backgroundColor: '#1c1410',
+    cardBackgroundColor: '#291f1a',
+    textColor: '#fef3c7',
+    borderColor: 'rgba(217,119,6,0.3)',
+    buttonHoverColor: '#f59e0b',
+  },
+  {
+    id: 'classic-blue',
+    name: '经典蓝',
     primaryColor: '#1e3a5f',
     secondaryColor: '#3b82f6',
     backgroundColor: '#f0f4f8',
     cardBackgroundColor: '#ffffff',
     textColor: '#1e293b',
-    borderColor: '#e2e8f0',
-    buttonHoverColor: '#1d4ed8',
-  },
-  {
-    id: 'vibrant-orange',
-    name: '活力橙',
-    primaryColor: '#9a3412',
-    secondaryColor: '#f97316',
-    backgroundColor: '#fff7ed',
-    cardBackgroundColor: '#ffffff',
-    textColor: '#431407',
-    borderColor: '#fed7aa',
-    buttonHoverColor: '#ea580c',
-  },
-  {
-    id: 'fresh-green',
-    name: '清新绿',
-    primaryColor: '#14532d',
-    secondaryColor: '#22c55e',
-    backgroundColor: '#f0fdf4',
-    cardBackgroundColor: '#ffffff',
-    textColor: '#14532d',
-    borderColor: '#bbf7d0',
-    buttonHoverColor: '#16a34a',
-  },
-  {
-    id: 'tech-purple',
-    name: '科技紫',
-    primaryColor: '#4c1d95',
-    secondaryColor: '#8b5cf6',
-    backgroundColor: '#faf5ff',
-    cardBackgroundColor: '#ffffff',
-    textColor: '#3b0764',
-    borderColor: '#e9d5ff',
-    buttonHoverColor: '#7c3aed',
-  },
-  {
-    id: 'starlight-black',
-    name: '星空黑',
-    primaryColor: '#0a0a1a',
-    secondaryColor: '#6366f1',
-    backgroundColor: '#050510',
-    cardBackgroundColor: '#0f0f23',
-    textColor: '#e2e8f0',
-    borderColor: 'rgba(99,102,241,0.3)',
-    buttonHoverColor: '#818cf8',
+    borderColor: '#cbd5e1',
+    buttonHoverColor: '#2563eb',
   },
 ];
 
 export const defaultTheme = themes[0];
+
+export interface Settings {
+  scale: number;
+  glassEffect: boolean;
+  animation: boolean;
+  cardMode: 'grid' | 'list';
+}
+
+export const defaultSettings: Settings = {
+  scale: 1,
+  glassEffect: true,
+  animation: true,
+  cardMode: 'grid',
+};
