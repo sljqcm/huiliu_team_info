@@ -4,6 +4,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   base: './',
+  // GitHub Pages 部署需要相对路径，base 设为 './' 即可
   build: {
     sourcemap: false,
     rollupOptions: {
