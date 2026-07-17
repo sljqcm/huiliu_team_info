@@ -45,4 +45,6 @@ export interface AppState {
   deletePerson: (moduleId: string, personId: string) => void;
   updatePerson: (moduleId: string, personId: string, updates: Partial<Person>) => void;
   setTheme: (themeId: string) => void;
+  exportData: () => void;
+  importData: (data: { modules: Module[]; currentThemeId: string }) => void;
 }

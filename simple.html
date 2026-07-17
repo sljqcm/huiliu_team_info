@@ -109,6 +109,9 @@ function render() {
     <p style="opacity:0.8;margin-bottom:1rem">脱硫脱硝班组管理平台</p>
     <button class="btn btn-primary" onclick="showAddModule()">+ 添加大项</button>
     <button class="btn btn-secondary" onclick="showThemes()">🎨 切换皮肤</button>
+    <button class="btn btn-secondary" onclick="exportData()">⬇️ 导出数据</button>
+    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ 导入数据</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
   <div class="container">
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem">`;
@@ -321,6 +324,52 @@ function deletePerson(moduleId, personId) {
 
 function closeModal(e) {
   if (!e || e.target.classList.contains('modal')) render();
+}
+
+function exportData() {
+  const data = {
+    version: 1,
+    exportDate: new Date().toISOString(),
+    modules: state.modules,
+    currentThemeId: state.currentTheme.id
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const dateStr = new Date().toLocaleDateString('zh-CN').replace(/\//g, '-');
+  a.download = '灰硫班组信息_' + dateStr + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.modules && Array.isArray(data.modules)) {
+        state.modules = data.modules;
+        if (data.currentThemeId) {
+          const th = state.themes.find(t => t.id === data.currentThemeId);
+          if (th) state.currentTheme = th;
+        }
+        save();
+        render();
+        alert('导入成功！');
+      } else {
+        alert('文件格式不正确');
+      }
+    } catch(err) {
+      alert('文件解析失败，请确认是有效的JSON文件');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
 }
 
 render();

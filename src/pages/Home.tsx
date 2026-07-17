@@ -20,6 +20,8 @@ export default function Home() {
     deletePerson,
     updatePerson,
     setTheme,
+    exportData,
+    importData,
   } = useStore();
 
   const [showSkinSelector, setShowSkinSelector] = useState(false);
@@ -43,6 +45,8 @@ export default function Home() {
         theme={currentTheme}
         onAddModule={() => setShowAddModuleModal(true)}
         onOpenSkinSelector={() => setShowSkinSelector(true)}
+        onExport={exportData}
+        onImport={importData}
       />
 
       <main className="max-w-6xl mx-auto px-4 py-8">

@@ -103,6 +103,34 @@ export const useStore = create<AppState>()(
         set((state) => ({
           currentTheme: state.themes.find((t) => t.id === themeId) || defaultTheme,
         })),
+
+      exportData: () => {
+        const state = useStore.getState();
+        const data = {
+          version: 1,
+          exportDate: new Date().toISOString(),
+          modules: state.modules,
+          currentThemeId: state.currentTheme.id,
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `灰硫班组信息_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      },
+
+      importData: (data) =>
+        set((state) => {
+          const theme = state.themes.find((t) => t.id === data.currentThemeId) || defaultTheme;
+          return {
+            modules: data.modules || state.modules,
+            currentTheme: theme,
+          };
+        }),
     }),
     {
       name: 'huiliu-team-storage',
