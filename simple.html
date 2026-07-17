@@ -64,6 +64,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .theme-btn{display:block;width:100%;padding:1rem;border-radius:0.5rem;border:2px solid transparent;margin-bottom:0.5rem;cursor:pointer;font-weight:500;transition:all 0.2s}
 .theme-btn.active{border-color:#3b82f6;transform:scale(1.02)}
 .hidden{display:none}
+@media(max-width:640px){.hidden-mobile{display:none!important}}
 </style>
 </head>
 <body>
@@ -137,54 +138,73 @@ function render() {
     document.body.style.backgroundImage = '';
   }
 
+  const isDark = t.id === 'star';
+  const glassBg = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.85)';
+  const glassBorder = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.6)';
+  const cardShadow = isDark ? '0 8px 32px rgba(0,0,0,0.3)' : '0 10px 30px -10px rgba(0,0,0,0.1)';
+  const textColor = isDark ? '#e2e8f0' : '#1e293b';
+  const textMuted = isDark ? 'rgba(255,255,255,0.6)' : '#64748b';
+
   const activeModule = state.modules.find(m => m.id === state.activeModuleId);
 
-  let html = `
-  <div class="header" style="background:linear-gradient(135deg,${t.primary},${t.secondary})">
-    <h1>灰硫班组信息</h1>
-    <p style="opacity:0.8;margin-bottom:1rem">脱硫脱硝班组管理平台</p>
-    <button class="btn btn-primary" onclick="showAddModule()">+ 添加大项</button>
-    <button class="btn btn-secondary" onclick="showThemes()">🎨 切换皮肤</button>
-    <button class="btn btn-secondary" onclick="exportData()">⬇️ 导出数据</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ 导入数据</button>
-    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
-  </div>`;
+  let html = `<div style="max-width:80rem;margin:0 auto;padding:1rem 0.75rem;min-height:calc(100vh - 0px);display:flex;flex-direction:column">`;
 
+  // 顶部导航栏
+  html += `<nav style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1.25rem;margin-bottom:1.25rem;background:${isDark?'rgba(30,30,40,0.92)':'rgba(255,255,255,0.92)'};border:1px solid ${glassBorder};border-radius:1rem;box-shadow:${cardShadow};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <div style="width:3rem;height:3rem;border-radius:1rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.25rem;background:linear-gradient(135deg,${t.primary},${t.secondary});box-shadow:0 4px 12px ${t.secondary}40;flex-shrink:0">灰</div>
+      <div>
+        <h1 style="font-weight:700;font-size:1.5rem;line-height:1.1;color:${textColor};margin:0">灰硫班组信息</h1>
+        <p style="font-size:0.875rem;color:${textMuted};margin:0">脱硫脱硝班组管理平台</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.5rem">
+      <button onclick="showAddModule()" style="display:flex;align-items:center;gap:0.375rem;padding:0.5rem 0.75rem;border-radius:0.5rem;color:#fff;font-size:0.875rem;font-weight:500;border:none;cursor:pointer;background:linear-gradient(135deg,${t.primary},${t.secondary});box-shadow:0 4px 12px ${t.secondary}40;transition:transform 0.2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">+ <span class="hidden-mobile">添加大项</span></button>
+      <button onclick="showThemes()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" title="切换皮肤">${isDark?'🌙':'🎨'}</button>
+      <button onclick="exportData()" class="btn-icon-sm hidden-mobile" style="background:${t.secondary}20;color:${t.secondary}" title="导出数据">⬇</button>
+      <label class="btn-icon-sm hidden-mobile" style="background:${t.secondary}20;color:${t.secondary};cursor:pointer" title="导入数据">⬆<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    </div>
+  </nav>`;
+
+  // page-header
+  const scale = state.scale;
+  html += `<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.75rem 1.5rem;margin-bottom:1.25rem;background:${glassBg};border:1px solid ${glassBorder};border-radius:1rem;box-shadow:${cardShadow};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+    <div style="display:flex;align-items:center;gap:0.5rem">`;
   if (activeModule) {
-    // 详情视图
-    html += `<div class="layout">
-      <div class="overlay ${state.sidebarOpen ? 'show' : ''}" onclick="toggleSidebar()"></div>
-      <aside class="sidebar ${state.sidebarOpen ? 'show' : ''}">
-        <button class="nav-item" style="margin-bottom:0.5rem;border-bottom:1px solid #e2e8f0;border-radius:0;padding-bottom:0.5rem" onclick="backToList()">← 返回总览</button>
-        <div class="sidebar-title">模块目录</div>
-        <nav style="display:flex;flex-direction:column;gap:0.25rem">`;
+    html += `<button onclick="backToList()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" title="返回总览">←</button>`;
+    const icon = activeModule.type === 'personnel' ? '👥' : '📋';
+    html += `<h2 style="font-size:1.25rem;font-weight:700;color:${textColor};margin:0;display:flex;align-items:center;gap:0.5rem">${icon} ${activeModule.title}</h2>`;
+    const cnt = activeModule.type === 'personnel' ? (activeModule.persons||[]).length + ' 人' : activeModule.items.length + ' 项';
+    html += `<span style="font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:0.375rem;font-weight:500;background:${t.secondary}20;color:${t.secondary}">${cnt}</span>`;
+  } else {
+    html += `<h2 style="font-size:1.25rem;font-weight:700;color:${textColor};margin:0;display:flex;align-items:center;gap:0.5rem">📋 模块总览</h2><span style="font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:0.375rem;font-weight:500;background:${t.secondary}20;color:${t.secondary}">共 ${state.modules.length} 个</span>`;
+  }
+  html += `</div>`;
+  if (!activeModule) {
+    html += `<div style="display:flex;align-items:center;gap:0.5rem">
+      <button onclick="zoomOut()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" ${scale <= 0.7 ? 'disabled' : ''}>－</button>
+      <span style="font-size:0.875rem;font-weight:500;width:3rem;text-align:center;color:${textColor}">${Math.round(scale*100)}%</span>
+      <button onclick="zoomIn()" class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" ${scale >= 1.5 ? 'disabled' : ''}>＋</button>
+    </div>`;
+  }
+  html += `</div>`;
 
-    state.modules.forEach(m => {
-      const isActive = m.id === activeModule.id;
-      const icon = m.type === 'personnel' ? '👥' : '📋';
-      html += `<button class="nav-item ${isActive ? 'active' : ''}" onclick="selectModule('${m.id}')">${icon} ${m.title}</button>`;
-    });
-
-    html += `</nav></aside>
-      <main class="workspace">
-        <button class="sidebar-toggle" onclick="toggleSidebar()">☰ 目录</button>`;
-
+  // 主内容区
+  html += `<div style="flex:1">`;
+  if (activeModule) {
     const m = activeModule;
     const icon = m.type === 'personnel' ? '👥' : '📋';
-    html += `<div class="card">
-      <div class="card-header" style="background:${t.primary}">
-        <h2>${icon} ${m.title}</h2>
-        <button class="btn-icon" style="background:rgba(255,255,255,0.2);color:#fff" onclick="deleteModule('${m.id}')">🗑️</button>
+    html += `<div class="card" style="background:${glassBg};border:1px solid ${glassBorder};border-radius:1rem;box-shadow:${cardShadow};overflow:hidden;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+      <div style="padding:0.75rem 1rem;background:${isDark?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.5)'};border-bottom:1px solid ${glassBorder};display:flex;align-items:center;justify-content:space-between">
+        <h2 style="font-size:1.25rem;font-weight:600;color:${textColor};margin:0">${icon} ${m.title}</h2>
+        <button class="btn-icon-sm" style="background:rgba(239,68,68,0.15);color:#ef4444" onclick="deleteModule('${m.id}')">🗑</button>
       </div>
-      <div class="card-body">`;
-
+      <div style="padding:1rem">`;
     if (m.type === 'personnel') {
-      const isDark = t.id === 'star';
       (m.persons || []).forEach(p => {
-        const glassBg = isDark ? 'rgba(255,255,255,0.08)' : t.secondary + '14';
-        const glassBorder = isDark ? 'rgba(255,255,255,0.15)' : t.secondary + '40';
-        const textColor = isDark ? '#e2e8f0' : '#1e293b';
-        html += `<div class="person-card" style="background:${glassBg};border:1px solid ${glassBorder}">
+        const pGlassBg = isDark ? 'rgba(255,255,255,0.08)' : t.secondary + '14';
+        const pGlassBorder = isDark ? 'rgba(255,255,255,0.15)' : t.secondary + '40';
+        html += `<div class="person-card" style="background:${pGlassBg};border:1px solid ${pGlassBorder}">
           <div class="person-card-glow" style="background:radial-gradient(circle, ${t.secondary}, transparent 70%)"></div>
           <div style="position:relative;display:flex;align-items:center;justify-content:space-between">
             <div class="person-info" style="gap:0.75rem">
@@ -205,73 +225,60 @@ function render() {
       html += `<button class="btn-add" onclick="showAddPerson('${m.id}')">+ 添加人员</button>`;
     } else {
       m.items.forEach(item => {
-        html += `<div class="item">
-          <div>${item.content}${item.date ? `<span style="font-size:0.75rem;color:#94a3b8;margin-left:0.5rem">${item.date}</span>` : ''}</div>
-        </div>`;
+        html += `<div class="item"><div>${item.content}${item.date ? `<span style="font-size:0.75rem;color:${textMuted};margin-left:0.5rem">${item.date}</span>` : ''}</div></div>`;
       });
       html += `<button class="btn-add" onclick="showAddItem('${m.id}')">+ 添加子项</button>`;
     }
-
-    html += `</div></div></main></div>`;
+    html += `</div></div>`;
+  } else if (state.modules.length === 0) {
+    html += `<div style="text-align:center;padding:4rem 1rem;border-radius:1rem;background:${glassBg};border:1px solid ${glassBorder};color:${textMuted}">暂无模块，请点击右上角"添加大项"</div>`;
   } else {
-    // 总览视图：小方块网格 + 缩放控制
-    const scale = state.scale;
-    html += `<div class="container">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:0.75rem;margin-bottom:1.5rem">
-        <div style="display:flex;align-items:center;gap:0.5rem;font-weight:500;color:${t.primary}">📋 模块总览 <span style="font-size:0.875rem;opacity:0.6">（共 ${state.modules.length} 个）</span></div>
-        <div style="display:flex;align-items:center;gap:0.5rem">
-          <button class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" onclick="zoomOut()" ${scale <= 0.7 ? 'disabled' : ''}>－</button>
-          <span style="font-size:0.875rem;font-weight:500;width:3rem;text-align:center;color:${t.primary}">${Math.round(scale * 100)}%</span>
-          <button class="btn-icon-sm" style="background:${t.secondary}20;color:${t.secondary}" onclick="zoomIn()" ${scale >= 1.5 ? 'disabled' : ''}>＋</button>
-        </div>
-      </div>`;
-
-    if (state.modules.length === 0) {
-      html += `<div style="text-align:center;padding:4rem 1rem;color:#94a3b8">暂无模块，请点击上方按钮添加大项</div>`;
-    } else {
-      const cardW = 210 * scale;
-      const cardH = 150 * scale;
-      html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(${cardW}px,1fr));gap:1rem">`;
-      state.modules.forEach(m => {
-        const icon = m.type === 'personnel' ? '👥' : '📋';
-        const count = m.type === 'personnel' ? (m.persons || []).length : m.items.length;
-        const countLabel = m.type === 'personnel' ? '成员' : '条目';
-        html += `<button onclick="selectModule('${m.id}')" style="position:relative;height:${cardH}px;background:linear-gradient(135deg,${t.primary},${t.secondary});border:none;border-radius:1rem;cursor:pointer;overflow:hidden;color:#fff;text-align:left;padding:${0.75*scale}rem;transition:all 0.3s;box-shadow:0 4px 12px rgba(0,0,0,0.1)" onmouseover="this.style.transform='scale(1.03)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
-          <div style="position:absolute;top:-1.5rem;right:-1.5rem;width:6rem;height:6rem;border-radius:50%;background:radial-gradient(circle,white,transparent 70%);opacity:0.2"></div>
-          <div style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between">
-              <span style="font-size:${1.5*scale}rem">${icon}</span>
-              <span style="font-size:${0.65*scale}rem;opacity:0.75;background:rgba(255,255,255,0.2);padding:${0.15*scale}rem ${0.4*scale}rem;border-radius:9999px">${m.type === 'personnel' ? '人员' : '内容'}</span>
-            </div>
-            <div>
-              <div style="font-weight:700;font-size:${1.05*scale}rem;line-height:1.2;margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.title}</div>
-              <div style="font-size:${0.7*scale}rem;opacity:0.8">${count} 个${countLabel}</div>
-            </div>
+    const cardW = 210 * scale;
+    const cardH = 150 * scale;
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(${cardW}px,1fr));gap:1rem">`;
+    state.modules.forEach(m => {
+      const icon = m.type === 'personnel' ? '👥' : '📋';
+      const count = m.type === 'personnel' ? (m.persons || []).length : m.items.length;
+      const countLabel = m.type === 'personnel' ? '成员' : '条目';
+      html += `<button onclick="selectModule('${m.id}')" style="position:relative;height:${cardH}px;background:${glassBg};border:1px solid ${glassBorder};border-radius:1rem;cursor:pointer;overflow:hidden;color:${textColor};text-align:left;padding:${0.75*scale}rem;transition:all 0.3s;box-shadow:${cardShadow};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 16px 40px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='${cardShadow}'">
+        <div style="position:absolute;top:0;left:0;right:0;height:0.375rem;background:linear-gradient(90deg,${t.primary},${t.secondary})"></div>
+        <div style="position:absolute;top:-1.5rem;right:-1.5rem;width:6rem;height:6rem;border-radius:50%;background:radial-gradient(circle,${t.secondary},transparent 70%);opacity:0.2"></div>
+        <div style="position:relative;height:100%;display:flex;flex-direction:column;justify-content:space-between">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between">
+            <div style="width:2.5rem;height:2.5rem;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.25rem;background:linear-gradient(135deg,${t.primary},${t.secondary});box-shadow:0 2px 8px ${t.secondary}40">${icon}</div>
+            <span style="font-size:${0.7*scale}rem;padding:0.15rem 0.5rem;border-radius:0.375rem;font-weight:500;background:${t.secondary}20;color:${t.secondary}">${m.type === 'personnel' ? '人员' : '内容'}</span>
           </div>
-        </button>`;
-      });
-      html += `</div>`;
-    }
+          <div>
+            <div style="font-weight:700;font-size:${1.05*scale}rem;line-height:1.2;margin-bottom:0.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${textColor}">${m.title}</div>
+            <div style="font-size:${0.75*scale}rem;color:${textMuted}">${count} 个${countLabel}</div>
+          </div>
+        </div>
+      </button>`;
+    });
     html += `</div>`;
   }
+  html += `</div>`;
 
+  // 吸底 footer
+  html += `<footer style="text-align:center;padding:0.75rem 1rem;margin-top:1.5rem;border-top:1px solid ${glassBorder};background:${glassBg};color:${textMuted};backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)">
+    <p style="font-size:0.875rem;margin:0;display:flex;align-items:center;justify-content:center;gap:0.5rem;flex-wrap:wrap">
+      <span>Copyright © 2026 灰硫班组信息</span>
+      <a href="https://github.com/sljqcm/huiliu_team_info" target="_blank" style="display:flex;align-items:center;gap:0.25rem;color:${t.secondary};text-decoration:none" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">⌂ GitHub Repository</a>
+    </p>
+  </footer>`;
+
+  html += `</div>`;
   document.getElementById('app').innerHTML = html;
   document.body.style.background = t.bg;
 }
 
 function selectModule(id) {
   state.activeModuleId = id;
-  state.sidebarOpen = false;
   render();
 }
 
 function backToList() {
   state.activeModuleId = null;
-  render();
-}
-
-function toggleSidebar() {
-  state.sidebarOpen = !state.sidebarOpen;
   render();
 }
 

@@ -1,6 +1,17 @@
 import { useState } from 'react';
-import { Users, FileText, Menu, X, ZoomIn, ZoomOut, ArrowLeft } from 'lucide-react';
-import { Header } from '../components/Header';
+import {
+  Users,
+  FileText,
+  Plus,
+  Palette,
+  Download,
+  Upload,
+  ZoomIn,
+  ZoomOut,
+  ArrowLeft,
+  Moon,
+  Github,
+} from 'lucide-react';
 import { ContentModule } from '../components/ContentModule';
 import { SkinSelector } from '../components/SkinSelector';
 import { AddModuleModal } from '../components/AddModuleModal';
@@ -28,42 +39,36 @@ export default function Home() {
   const [showSkinSelector, setShowSkinSelector] = useState(false);
   const [showAddModuleModal, setShowAddModuleModal] = useState(false);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  // 缩放比例：1 = 210×150px，范围 0.7 ~ 1.5
   const [scale, setScale] = useState(1);
 
   const handleAddModule = (title: string, type: 'standard' | 'personnel') => {
-    addModule({
-      title,
-      type,
-      items: [],
-      persons: type === 'personnel' ? [] : undefined,
-    });
+    addModule({ title, type, items: [], persons: type === 'personnel' ? [] : undefined });
   };
 
   const activeModule = modules.find((m) => m.id === activeModuleId);
 
-  const handleSelectModule = (id: string) => {
-    setActiveModuleId(id);
-    setSidebarOpen(false);
-  };
-
-  const handleBackToList = () => {
-    setActiveModuleId(null);
-  };
+  const handleSelectModule = (id: string) => setActiveModuleId(id);
+  const handleBackToList = () => setActiveModuleId(null);
 
   const handleDeleteModule = (id: string) => {
     deleteModule(id);
-    if (activeModuleId === id) {
-      setActiveModuleId(null);
-    }
+    if (activeModuleId === id) setActiveModuleId(null);
   };
 
   const isDark = currentTheme.id === 'starlight-black';
 
+  // 玻璃变量
+  const glassBg = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.85)';
+  const glassBorder = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.6)';
+  const glassHeaderBg = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)';
+  const cardShadow = isDark
+    ? '0 8px 32px rgba(0,0,0,0.3)'
+    : '0 10px 30px -10px rgba(0,0,0,0.1)';
+  const primaryColor = currentTheme.secondaryColor;
+
   return (
     <div
-      className="min-h-screen relative"
+      className="min-h-screen relative flex flex-col"
       style={{ backgroundColor: currentTheme.backgroundColor }}
     >
       {/* 星空黑主题：星星背景 */}
@@ -85,275 +90,342 @@ export default function Home() {
             `,
             backgroundSize: '500px 300px',
             backgroundRepeat: 'repeat',
-            opacity: 0.4,
+            opacity: 0.5,
           }}
         />
       )}
 
-      <Header
-        theme={currentTheme}
-        onAddModule={() => setShowAddModuleModal(true)}
-        onOpenSkinSelector={() => setShowSkinSelector(true)}
-        onExport={exportData}
-        onImport={importData}
-      />
-
-      {/* 移动端目录切换 */}
-      {activeModule && (
-        <div className="md:hidden">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="fixed top-4 right-4 z-30 p-2 rounded-lg shadow-lg"
-            style={{
-              backgroundColor: currentTheme.cardBackgroundColor,
-              color: currentTheme.textColor,
-              border: `1px solid ${currentTheme.borderColor}`,
-            }}
-          >
-            <Menu size={20} />
-          </button>
-        </div>
-      )}
-
-      {/* 移动端遮罩 */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-30 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* 左侧目录栏 - 仅在查看详情时显示 */}
-      {activeModule && (
-        <aside
-          className={`fixed md:sticky top-0 md:top-4 left-0 h-screen md:h-auto md:self-start w-64 z-40 md:z-0 transform transition-transform duration-300 md:transform-none ${
-            sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-          }`}
+      <div className="container mx-auto px-3 md:px-6 py-4 md:py-6 flex-1 w-full max-w-7xl">
+        {/* 顶部导航栏 */}
+        <nav
+          className="flex items-center justify-between px-4 md:px-5 py-3 mb-5"
           style={{
-            backgroundColor: currentTheme.cardBackgroundColor,
-            borderRight: `1px solid ${currentTheme.borderColor}`,
+            backgroundColor: isDark ? 'rgba(30,30,40,0.92)' : 'rgba(255,255,255,0.92)',
+            border: `1px solid ${glassBorder}`,
+            borderRadius: '16px',
+            boxShadow: cardShadow,
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
           }}
         >
-          <div className="p-4 md:rounded-xl">
-            <div className="flex items-center justify-between mb-4 md:hidden">
-              <h3 className="font-bold" style={{ color: currentTheme.textColor }}>
-                目录
-              </h3>
-              <button
-                onClick={() => setSidebarOpen(false)}
-                className="p-1"
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl flex-shrink-0"
+              style={{
+                background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${primaryColor})`,
+                boxShadow: `0 4px 12px ${primaryColor}40`,
+              }}
+            >
+              灰
+            </div>
+            <div>
+              <h1
+                className="font-bold text-lg md:text-2xl leading-tight"
                 style={{ color: currentTheme.textColor }}
               >
-                <X size={20} />
+                灰硫班组信息
+              </h1>
+              <p
+                className="text-xs md:text-sm"
+                style={{ color: `${currentTheme.textColor}80` }}
+              >
+                脱硫脱硝班组管理平台
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAddModuleModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-sm font-medium transition-all hover:-translate-y-0.5"
+              style={{
+                background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${primaryColor})`,
+                boxShadow: `0 4px 12px ${primaryColor}40`,
+              }}
+              title="添加大项"
+            >
+              <Plus size={16} />
+              <span className="hidden md:inline">添加大项</span>
+            </button>
+            <button
+              onClick={() => setShowSkinSelector(true)}
+              className="p-2 rounded-lg transition-all hover:scale-110"
+              style={{
+                backgroundColor: `${primaryColor}20`,
+                color: primaryColor,
+              }}
+              title="切换皮肤"
+            >
+              {isDark ? <Moon size={18} /> : <Palette size={18} />}
+            </button>
+            <button
+              onClick={exportData}
+              className="p-2 rounded-lg transition-all hover:scale-110 hidden sm:block"
+              style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}
+              title="导出数据"
+            >
+              <Download size={18} />
+            </button>
+            <label
+              className="p-2 rounded-lg transition-all hover:scale-110 cursor-pointer hidden sm:block"
+              style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}
+              title="导入数据"
+            >
+              <Upload size={18} />
+              <input
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    importData(data);
+                  } catch (err) {
+                    alert('导入失败：文件格式错误');
+                  }
+                  e.target.value = '';
+                }}
+              />
+            </label>
+          </div>
+        </nav>
+
+        {/* page-header 二级标题栏 */}
+        <div
+          className="flex items-center justify-between flex-wrap gap-3 px-4 md:px-6 py-3 md:py-4 mb-5"
+          style={{
+            backgroundColor: glassBg,
+            border: `1px solid ${glassBorder}`,
+            borderRadius: '16px',
+            boxShadow: cardShadow,
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            {activeModule && (
+              <button
+                onClick={handleBackToList}
+                className="p-1.5 rounded-lg transition-all hover:scale-110"
+                style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}
+                title="返回总览"
+              >
+                <ArrowLeft size={18} />
+              </button>
+            )}
+            <h2
+              className="text-base md:text-xl font-bold flex items-center gap-2"
+              style={{ color: currentTheme.textColor }}
+            >
+              {activeModule ? (
+                <>
+                  {activeModule.type === 'personnel' ? (
+                    <Users size={20} />
+                  ) : (
+                    <FileText size={20} />
+                  )}
+                  {activeModule.title}
+                </>
+              ) : (
+                <>
+                  <FileText size={20} />
+                  模块总览
+                </>
+              )}
+            </h2>
+            <span
+              className="text-xs px-2 py-0.5 rounded-md font-medium"
+              style={{
+                backgroundColor: `${primaryColor}20`,
+                color: primaryColor,
+              }}
+            >
+              {activeModule
+                ? activeModule.type === 'personnel'
+                  ? `${(activeModule.persons || []).length} 人`
+                  : `${activeModule.items.length} 项`
+                : `共 ${modules.length} 个`}
+            </span>
+          </div>
+
+          {!activeModule && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setScale((s) => Math.max(0.7, s - 0.1))}
+                className="p-2 rounded-lg transition-all hover:scale-110 disabled:opacity-40"
+                style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}
+                disabled={scale <= 0.7}
+                title="缩小"
+              >
+                <ZoomOut size={16} />
+              </button>
+              <span
+                className="text-sm font-medium w-12 text-center"
+                style={{ color: currentTheme.textColor }}
+              >
+                {Math.round(scale * 100)}%
+              </span>
+              <button
+                onClick={() => setScale((s) => Math.min(1.5, s + 0.1))}
+                className="p-2 rounded-lg transition-all hover:scale-110 disabled:opacity-40"
+                style={{ backgroundColor: `${primaryColor}20`, color: primaryColor }}
+                disabled={scale >= 1.5}
+                title="放大"
+              >
+                <ZoomIn size={16} />
               </button>
             </div>
+          )}
+        </div>
 
-            <button
-              onClick={handleBackToList}
-              className="flex items-center gap-2 mb-3 text-sm pb-2 w-full"
+        {/* 主内容区 */}
+        <div className="flex-1">
+          {activeModule ? (
+            <ContentModule
+              module={activeModule}
+              theme={currentTheme}
+              onAddSubItem={addSubItem}
+              onDeleteSubItem={deleteSubItem}
+              onUpdateSubItem={updateSubItem}
+              onAddPerson={addPerson}
+              onDeletePerson={deletePerson}
+              onUpdatePerson={updatePerson}
+              onDeleteModule={handleDeleteModule}
+              onUpdateModule={updateModule}
+            />
+          ) : modules.length === 0 ? (
+            <div
+              className="text-center py-16 rounded-2xl"
               style={{
-                color: currentTheme.textColor,
-                borderBottom: `1px solid ${currentTheme.borderColor}`,
+                backgroundColor: glassBg,
+                border: `1px solid ${glassBorder}`,
+                color: `${currentTheme.textColor}80`,
               }}
             >
-              <ArrowLeft size={16} />
-              返回总览
-            </button>
-
-            <h3
-              className="font-bold mb-3 hidden md:block pb-2"
+              <p className="text-lg">暂无模块，请点击右上角"添加大项"</p>
+            </div>
+          ) : (
+            // 三列瀑布流卡片网格（参考 domain-autocheck）
+            <div
+              className="grid gap-3 md:gap-4"
               style={{
-                color: currentTheme.textColor,
-                borderBottom: `1px solid ${currentTheme.borderColor}`,
+                gridTemplateColumns: `repeat(auto-fill, minmax(${210 * scale}px, 1fr))`,
               }}
             >
-              模块目录
-            </h3>
-
-            <nav className="space-y-1 max-h-[60vh] md:max-h-[70vh] overflow-y-auto">
               {modules.map((module) => {
-                const isActive = activeModule?.id === module.id;
+                const count =
+                  module.type === 'personnel'
+                    ? (module.persons || []).length
+                    : module.items.length;
                 return (
                   <button
                     key={module.id}
                     onClick={() => handleSelectModule(module.id)}
-                    className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-left transition-all duration-200 text-sm"
+                    className="group relative overflow-hidden text-left transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
                     style={{
-                      backgroundColor: isActive
-                        ? currentTheme.secondaryColor
-                        : 'transparent',
-                      color: isActive ? '#ffffff' : currentTheme.textColor,
-                      fontWeight: isActive ? 600 : 400,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = `${currentTheme.secondaryColor}15`;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
+                      height: `${150 * scale}px`,
+                      backgroundColor: glassBg,
+                      border: `1px solid ${glassBorder}`,
+                      borderRadius: '16px',
+                      boxShadow: cardShadow,
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
                     }}
                   >
-                    {module.type === 'personnel' ? (
-                      <Users size={16} className="flex-shrink-0" />
-                    ) : (
-                      <FileText size={16} className="flex-shrink-0" />
-                    )}
-                    <span className="truncate">{module.title}</span>
+                    {/* 顶部彩色条 */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-1.5"
+                      style={{
+                        background: `linear-gradient(90deg, ${currentTheme.primaryColor}, ${primaryColor})`,
+                      }}
+                    />
+                    {/* 装饰光晕 */}
+                    <div
+                      className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-20 group-hover:opacity-40 transition-opacity"
+                      style={{
+                        background: `radial-gradient(circle, ${primaryColor}, transparent 70%)`,
+                      }}
+                    />
+
+                    <div
+                      className="relative h-full p-4 flex flex-col justify-between"
+                      style={{ color: currentTheme.textColor }}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center text-white"
+                          style={{
+                            background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${primaryColor})`,
+                            boxShadow: `0 2px 8px ${primaryColor}40`,
+                          }}
+                        >
+                          {module.type === 'personnel' ? (
+                            <Users size={20} />
+                          ) : (
+                            <FileText size={20} />
+                          )}
+                        </div>
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-md font-medium"
+                          style={{
+                            backgroundColor: `${primaryColor}20`,
+                            color: primaryColor,
+                          }}
+                        >
+                          {module.type === 'personnel' ? '人员' : '内容'}
+                        </span>
+                      </div>
+                      <div>
+                        <h3
+                          className="font-bold leading-tight mb-1 truncate"
+                          style={{ fontSize: `${1.05 * scale}rem` }}
+                        >
+                          {module.title}
+                        </h3>
+                        <p
+                          className="text-xs"
+                          style={{ color: `${currentTheme.textColor}80` }}
+                        >
+                          {count} 个{module.type === 'personnel' ? '成员' : '条目'}
+                        </p>
+                      </div>
+                    </div>
                   </button>
                 );
               })}
-            </nav>
-          </div>
-        </aside>
-      )}
-
-      <main className="relative">
-        {activeModule ? (
-          // 详情视图
-          <div className="flex max-w-7xl mx-auto">
-            {/* 左侧栏占位（桌面端） */}
-            <div className="hidden md:block w-64 flex-shrink-0" />
-            <div className="flex-1 p-4 md:p-8 min-w-0">
-              <ContentModule
-                module={activeModule}
-                theme={currentTheme}
-                onAddSubItem={addSubItem}
-                onDeleteSubItem={deleteSubItem}
-                onUpdateSubItem={updateSubItem}
-                onAddPerson={addPerson}
-                onDeletePerson={deletePerson}
-                onUpdatePerson={updatePerson}
-                onDeleteModule={handleDeleteModule}
-                onUpdateModule={updateModule}
-              />
             </div>
-          </div>
-        ) : (
-          // 总览视图：210×150 小方块网格 + 缩放控制
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            {/* 缩放控制条 */}
-            <div
-              className="flex items-center justify-between mb-6 p-3 rounded-xl"
-              style={{
-                backgroundColor: currentTheme.cardBackgroundColor,
-                border: `1px solid ${currentTheme.borderColor}`,
-              }}
-            >
-              <div className="flex items-center gap-2" style={{ color: currentTheme.textColor }}>
-                <FileText size={18} />
-                <span className="font-medium">模块总览</span>
-                <span className="text-sm opacity-60">（共 {modules.length} 个）</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setScale((s) => Math.max(0.7, s - 0.1))}
-                  className="p-2 rounded-lg transition-all"
-                  style={{
-                    backgroundColor: `${currentTheme.secondaryColor}20`,
-                    color: currentTheme.secondaryColor,
-                  }}
-                  disabled={scale <= 0.7}
-                  title="缩小"
-                >
-                  <ZoomOut size={16} />
-                </button>
-                <span
-                  className="text-sm font-medium w-12 text-center"
-                  style={{ color: currentTheme.textColor }}
-                >
-                  {Math.round(scale * 100)}%
-                </span>
-                <button
-                  onClick={() => setScale((s) => Math.min(1.5, s + 0.1))}
-                  className="p-2 rounded-lg transition-all"
-                  style={{
-                    backgroundColor: `${currentTheme.secondaryColor}20`,
-                    color: currentTheme.secondaryColor,
-                  }}
-                  disabled={scale >= 1.5}
-                  title="放大"
-                >
-                  <ZoomIn size={16} />
-                </button>
-              </div>
-            </div>
+          )}
+        </div>
+      </div>
 
-            {/* 小方块网格 */}
-            {modules.length === 0 ? (
-              <div
-                className="text-center py-16"
-                style={{ color: `${currentTheme.textColor}60` }}
-              >
-                <p className="text-lg">暂无模块，请点击上方按钮添加大项</p>
-              </div>
-            ) : (
-              <div
-                className="grid gap-4"
-                style={{
-                  gridTemplateColumns: `repeat(auto-fill, minmax(${210 * scale}px, 1fr))`,
-                }}
-              >
-                {modules.map((module) => {
-                  const itemCount =
-                    module.type === 'personnel'
-                      ? (module.persons || []).length
-                      : module.items.length;
-                  return (
-                    <button
-                      key={module.id}
-                      onClick={() => handleSelectModule(module.id)}
-                      className="group relative overflow-hidden rounded-2xl transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl text-left"
-                      style={{
-                        width: '100%',
-                        height: `${150 * scale}px`,
-                        background: `linear-gradient(135deg, ${currentTheme.primaryColor}, ${currentTheme.secondaryColor})`,
-                        boxShadow: isDark
-                          ? '0 4px 16px rgba(0,0,0,0.4)'
-                          : '0 4px 12px rgba(0,0,0,0.1)',
-                      }}
-                    >
-                      {/* 装饰光晕 */}
-                      <div
-                        className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20 group-hover:opacity-40 transition-opacity"
-                        style={{
-                          background: 'radial-gradient(circle, white, transparent 70%)',
-                        }}
-                      />
-
-                      <div className="relative h-full p-4 flex flex-col justify-between text-white">
-                        <div className="flex items-start justify-between">
-                          {module.type === 'personnel' ? (
-                            <Users size={28} className="opacity-90" />
-                          ) : (
-                            <FileText size={28} className="opacity-90" />
-                          )}
-                          <span className="text-xs opacity-75 bg-white/20 px-2 py-0.5 rounded-full">
-                            {module.type === 'personnel' ? '人员' : '内容'}
-                          </span>
-                        </div>
-                        <div>
-                          <h3
-                            className="font-bold leading-tight mb-1 truncate"
-                            style={{ fontSize: `${1.1 * scale}rem` }}
-                          >
-                            {module.title}
-                          </h3>
-                          <p className="text-xs opacity-80">
-                            {itemCount} 个{module.type === 'personnel' ? '成员' : '条目'}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-      </main>
+      {/* 吸底 footer */}
+      <footer
+        className="text-center py-3 px-4 mt-auto"
+        style={{
+          borderTop: `1px solid ${glassBorder}`,
+          backgroundColor: glassBg,
+          color: `${currentTheme.textColor}80`,
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+        }}
+      >
+        <p className="text-xs md:text-sm flex items-center justify-center gap-2">
+          <span>Copyright © 2026 灰硫班组信息</span>
+          <a
+            href="https://github.com/sljqcm/huiliu_team_info"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 hover:underline"
+            style={{ color: primaryColor }}
+          >
+            <Github size={14} />
+            GitHub Repository
+          </a>
+        </p>
+      </footer>
 
       {showSkinSelector && (
         <SkinSelector
