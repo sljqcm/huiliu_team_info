@@ -119,6 +119,17 @@ export const themes: Theme[] = [
     borderColor: '#e9d5ff',
     buttonHoverColor: '#7c3aed',
   },
+  {
+    id: 'starlight-black',
+    name: '星空黑',
+    primaryColor: '#0a0a1a',
+    secondaryColor: '#6366f1',
+    backgroundColor: '#050510',
+    cardBackgroundColor: '#0f0f23',
+    textColor: '#e2e8f0',
+    borderColor: 'rgba(99,102,241,0.3)',
+    buttonHoverColor: '#818cf8',
+  },
 ];
 
 export const defaultTheme = themes[0];

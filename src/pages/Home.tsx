@@ -59,9 +59,32 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen relative"
       style={{ backgroundColor: currentTheme.backgroundColor }}
     >
+      {/* 星空黑主题：星星背景 */}
+      {currentTheme.id === 'starlight-black' && (
+        <div
+          className="fixed inset-0 pointer-events-none"
+          style={{
+            backgroundImage: `
+              radial-gradient(2px 2px at 20px 30px, white, transparent),
+              radial-gradient(1px 1px at 40px 70px, white, transparent),
+              radial-gradient(1px 1px at 90px 40px, white, transparent),
+              radial-gradient(2px 2px at 160px 120px, white, transparent),
+              radial-gradient(1px 1px at 200px 200px, white, transparent),
+              radial-gradient(1.5px 1.5px at 250px 80px, white, transparent),
+              radial-gradient(1px 1px at 300px 150px, white, transparent),
+              radial-gradient(2px 2px at 350px 250px, white, transparent),
+              radial-gradient(1px 1px at 400px 100px, white, transparent),
+              radial-gradient(1.5px 1.5px at 450px 200px, white, transparent)
+            `,
+            backgroundSize: '500px 300px',
+            backgroundRepeat: 'repeat',
+            opacity: 0.4,
+          }}
+        />
+      )}
       <Header
         theme={currentTheme}
         onAddModule={() => setShowAddModuleModal(true)}

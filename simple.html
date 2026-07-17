@@ -39,7 +39,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .btn-delete{background:#fee2e2;color:#ef4444}
 .btn-add{width:100%;padding:0.75rem;border:2px dashed #e2e8f0;background:transparent;border-radius:0.5rem;cursor:pointer;color:#64748b;display:flex;align-items:center;justify-content:center;gap:0.5rem}
 .btn-add:hover{border-color:#3b82f6;background:#eff6ff;color:#3b82f6}
-.person-card{display:flex;align-items:center;justify-content:space-between;padding:1rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.5rem;margin-bottom:0.5rem}
+.person-card{position:relative;padding:1rem;border-radius:1rem;margin-bottom:0.5rem;overflow:hidden;transition:all 0.3s;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);cursor:default}
+.person-card:hover{transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,0.15)}
+.person-card-glow{position:absolute;top:-2rem;right:-2rem;width:6rem;height:6rem;border-radius:50%;opacity:0.2;transition:opacity 0.3s}
+.person-card:hover .person-card-glow{opacity:0.4}
+.person-avatar{width:2.75rem;height:2.75rem;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
+.person-actions{display:flex;gap:0.375rem;opacity:0;transition:opacity 0.2s}
+.person-card:hover .person-actions{opacity:1}
+.btn-icon-sm{padding:0.375rem;border-radius:0.5rem;border:none;cursor:pointer;transition:transform 0.2s}
+.btn-icon-sm:hover{transform:scale(1.1)}
 .person-info{display:flex;align-items:center;gap:1rem}
 .avatar{width:48px;height:48px;background:#3b82f6;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:50;padding:1rem}
@@ -101,7 +109,8 @@ const state = {
     {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'},
     {id:'orange',name:'活力橙',primary:'#c2410c',secondary:'#f97316',bg:'#fff7ed'},
     {id:'green',name:'清新绿',primary:'#166534',secondary:'#22c55e',bg:'#f0fdf4'},
-    {id:'purple',name:'科技紫',primary:'#581c87',secondary:'#a855f7',bg:'#faf5ff'}
+    {id:'purple',name:'科技紫',primary:'#581c87',secondary:'#a855f7',bg:'#faf5ff'},
+    {id:'star',name:'星空黑',primary:'#0a0a1a',secondary:'#6366f1',bg:'#050510'}
   ],
   currentTheme: JSON.parse(localStorage.getItem('huiliu-theme')) || {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'},
   activeModuleId: null,
@@ -123,6 +132,14 @@ function genId() { return Math.random().toString(36).substr(2,9); }
 function render() {
   const t = state.currentTheme;
   document.body.style.background = t.bg;
+  // 星空黑主题：添加星星背景
+  if (t.id === 'star') {
+    document.body.style.backgroundImage = `radial-gradient(2px 2px at 20px 30px, white, transparent), radial-gradient(1px 1px at 40px 70px, white, transparent), radial-gradient(1px 1px at 90px 40px, white, transparent), radial-gradient(2px 2px at 160px 120px, white, transparent), radial-gradient(1px 1px at 200px 200px, white, transparent), radial-gradient(1.5px 1.5px at 250px 80px, white, transparent), radial-gradient(1px 1px at 300px 150px, white, transparent), radial-gradient(2px 2px at 350px 250px, white, transparent)`;
+    document.body.style.backgroundSize = '400px 300px';
+    document.body.style.backgroundRepeat = 'repeat';
+  } else {
+    document.body.style.backgroundImage = '';
+  }
 
   // 查找当前激活的模块
   let activeModule = state.modules.find(m => m.id === state.activeModuleId);
@@ -173,17 +190,27 @@ function render() {
       <div class="card-body">`;
 
     if (m.type === 'personnel') {
+      const isDark = t.id === 'star';
       (m.persons || []).forEach(p => {
-        html += `<div class="person-card">
-          <div class="person-info">
-            <div class="avatar" style="background:${t.secondary}">${p.name.charAt(0)}</div>
-            <div>
-              <div style="font-weight:600">${p.name}</div>
-              <div style="font-size:0.875rem;color:#64748b">${p.position}</div>
-              <div style="font-size:0.75rem;color:#94a3b8">📞 ${p.contact}</div>
+        const glassBg = isDark ? 'rgba(255,255,255,0.08)' : t.secondary + '14';
+        const glassBorder = isDark ? 'rgba(255,255,255,0.15)' : t.secondary + '40';
+        const textColor = isDark ? '#e2e8f0' : '#1e293b';
+        html += `<div class="person-card" style="background:${glassBg};border:1px solid ${glassBorder}">
+          <div class="person-card-glow" style="background:radial-gradient(circle, ${t.secondary}, transparent 70%)"></div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between">
+            <div class="person-info" style="gap:0.75rem">
+              <div class="person-avatar" style="background:linear-gradient(135deg, ${t.secondary}, ${t.primary});box-shadow:0 2px 8px ${t.secondary}50">${p.name.charAt(0)}</div>
+              <div>
+                <div style="font-weight:600;color:${textColor}">${p.name}</div>
+                <div style="font-size:0.75rem;color:${textColor};opacity:0.7;margin-top:0.125rem">${p.position}</div>
+              </div>
+            </div>
+            <div class="person-actions">
+              <button class="btn-icon-sm" style="background:${isDark?'rgba(255,255,255,0.1)':t.secondary+'20'};color:${isDark?'#fff':t.secondary}" onclick="deletePerson('${m.id}','${p.id}')">✎</button>
+              <button class="btn-icon-sm" style="background:rgba(239,68,68,0.15);color:#ef4444" onclick="deletePerson('${m.id}','${p.id}')">🗑</button>
             </div>
           </div>
-          <button class="btn-icon btn-delete" onclick="deletePerson('${m.id}','${p.id}')">🗑️</button>
+          <div style="position:relative;display:flex;align-items:center;gap:0.375rem;font-size:0.75rem;padding-top:0.5rem;margin-top:0.5rem;border-top:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.08)'};color:${textColor};opacity:0.8">📞 ${p.contact}</div>
         </div>`;
       });
       html += `<button class="btn-add" onclick="showAddPerson('${m.id}')">+ 添加人员</button>`;

@@ -9,56 +9,120 @@ interface PersonnelCardProps {
 }
 
 export function PersonnelCard({ person, theme, onEdit, onDelete }: PersonnelCardProps) {
+  // 毛玻璃效果：半透明背景 + 高斯模糊 + 细边框
+  const isDark = theme.id === 'starlight-black';
+  const glassBg = isDark
+    ? 'rgba(255,255,255,0.08)'
+    : `${theme.secondaryColor}14`;
+  const glassBorder = isDark
+    ? 'rgba(255,255,255,0.15)'
+    : `${theme.secondaryColor}40`;
+
   return (
     <div
-      className="flex items-center justify-between p-4 rounded-xl border transition-all duration-200 hover:shadow-md"
+      className="rounded-2xl p-4 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl relative overflow-hidden group"
       style={{
-        backgroundColor: theme.cardBackgroundColor,
-        borderColor: theme.borderColor,
+        backgroundColor: glassBg,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        border: `1px solid ${glassBorder}`,
+        boxShadow: isDark
+          ? '0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)'
+          : '0 2px 8px rgba(0,0,0,0.05)',
       }}
     >
-      <div className="flex items-center gap-4">
-        <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg"
-          style={{ backgroundColor: theme.secondaryColor }}
-        >
-          {person.name.charAt(0)}
-        </div>
-        <div>
-          <h4 className="font-semibold" style={{ color: theme.textColor }}>
-            {person.name}
-          </h4>
-          <p className="text-sm" style={{ color: `${theme.textColor}80` }}>
-            {person.position}
-          </p>
-          <div className="flex items-center gap-1 text-sm mt-1" style={{ color: `${theme.textColor}60` }}>
-            <Phone size={12} />
-            {person.contact}
+      {/* 顶部光晕装饰 */}
+      <div
+        className="absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-20 group-hover:opacity-40 transition-opacity"
+        style={{
+          background: `radial-gradient(circle, ${theme.secondaryColor}, transparent 70%)`,
+        }}
+      />
+
+      <div className="relative flex flex-col gap-3">
+        {/* 头部：头像 + 姓名 + 操作按钮 */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* 小方块头像 */}
+            <div
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-base flex-shrink-0"
+              style={{
+                background: `linear-gradient(135deg, ${theme.secondaryColor}, ${theme.primaryColor})`,
+                boxShadow: `0 2px 8px ${theme.secondaryColor}50`,
+              }}
+            >
+              {person.name.charAt(0)}
+            </div>
+            <div>
+              <h4
+                className="font-semibold text-base leading-tight"
+                style={{ color: theme.textColor }}
+              >
+                {person.name}
+              </h4>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: `${theme.textColor}80` }}
+              >
+                {person.position}
+              </p>
+            </div>
+          </div>
+
+          {/* 操作按钮 */}
+          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={onEdit}
+              className="p-1.5 rounded-lg transition-all"
+              style={{
+                backgroundColor: isDark
+                  ? 'rgba(255,255,255,0.1)'
+                  : `${theme.secondaryColor}20`,
+                color: isDark ? '#fff' : theme.secondaryColor,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              title="编辑"
+            >
+              <Edit2 size={14} />
+            </button>
+            <button
+              onClick={onDelete}
+              className="p-1.5 rounded-lg transition-all"
+              style={{
+                backgroundColor: 'rgba(239,68,68,0.15)',
+                color: '#ef4444',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              title="删除"
+            >
+              <Trash2 size={14} />
+            </button>
           </div>
         </div>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={onEdit}
-          className="p-2 rounded-lg transition-colors"
-          style={{ backgroundColor: `${theme.secondaryColor}20`, color: theme.secondaryColor }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = `${theme.secondaryColor}30`;
+
+        {/* 底部：联系方式 */}
+        <div
+          className="flex items-center gap-1.5 text-xs pt-2 border-t"
+          style={{
+            color: `${theme.textColor}80`,
+            borderColor: isDark
+              ? 'rgba(255,255,255,0.1)'
+              : `${theme.borderColor}`,
           }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = `${theme.secondaryColor}20`;
-          }}
-          title="编辑"
         >
-          <Edit2 size={18} />
-        </button>
-        <button
-          onClick={onDelete}
-          className="p-2 rounded-lg transition-colors hover:bg-red-100 hover:text-red-600"
-          title="删除"
-        >
-          <Trash2 size={18} />
-        </button>
+          <Phone size={11} />
+          <span>{person.contact}</span>
+        </div>
       </div>
     </div>
   );
