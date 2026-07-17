@@ -49,23 +49,39 @@ export default function Home() {
         onImport={importData}
       />
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {modules.map((module) => (
-            <ContentModule
-              key={module.id}
-              module={module}
-              theme={currentTheme}
-              onAddSubItem={addSubItem}
-              onDeleteSubItem={deleteSubItem}
-              onUpdateSubItem={updateSubItem}
-              onAddPerson={addPerson}
-              onDeletePerson={deletePerson}
-              onUpdatePerson={updatePerson}
-              onDeleteModule={deleteModule}
-              onUpdateModule={updateModule}
-            />
-          ))}
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        <div className="relative">
+          {/* 树状主干左侧连接线 */}
+          <div
+            className="absolute left-6 top-0 bottom-0 w-0.5 hidden md:block"
+            style={{ backgroundColor: `${currentTheme.secondaryColor}40` }}
+          />
+          <div className="space-y-5">
+            {modules.map((module, index) => (
+              <div key={module.id} className="relative md:pl-16">
+                {/* 树干节点圆点 */}
+                <div
+                  className="hidden md:flex absolute left-6 top-8 -translate-x-1/2 w-4 h-4 rounded-full border-4 z-10 items-center justify-center"
+                  style={{
+                    backgroundColor: currentTheme.cardBackgroundColor,
+                    borderColor: currentTheme.secondaryColor,
+                  }}
+                />
+                <ContentModule
+                  module={module}
+                  theme={currentTheme}
+                  onAddSubItem={addSubItem}
+                  onDeleteSubItem={deleteSubItem}
+                  onUpdateSubItem={updateSubItem}
+                  onAddPerson={addPerson}
+                  onDeletePerson={deletePerson}
+                  onUpdatePerson={updatePerson}
+                  onDeleteModule={deleteModule}
+                  onUpdateModule={updateModule}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         {modules.length === 0 && (

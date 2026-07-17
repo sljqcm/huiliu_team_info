@@ -13,7 +13,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .btn-primary{background:#fff;color:#1e3a5f}
 .btn-secondary{background:rgba(255,255,255,0.2);color:#fff}
 .container{max-width:900px;margin:0 auto;padding:1rem}
-.card{background:#fff;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);margin-bottom:1rem;overflow:hidden}
+.tree-wrap{position:relative;padding-left:2rem}
+.tree-wrap::before{content:'';position:absolute;left:0.5rem;top:0;bottom:0;width:2px;background:rgba(59,130,246,0.3)}
+.tree-node{position:relative;margin-bottom:1rem}
+.tree-node::before{content:'';position:absolute;left:-1.5rem;top:1.5rem;width:1rem;height:2px;background:rgba(59,130,246,0.3)}
+.tree-node-dot{position:absolute;left:-1.7rem;top:1.35rem;width:0.75rem;height:0.75rem;border-radius:50%;background:#fff;border:3px solid #3b82f6}
+.card{background:#fff;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden}
 .card-header{background:#1e3a5f;color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center}
 .card-header h2{font-size:1.25rem}
 .card-body{padding:1rem}
@@ -114,11 +119,11 @@ function render() {
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
   <div class="container">
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem">`;
-  
+    <div class="tree-wrap">`;
+
   state.modules.forEach(m => {
     const icon = m.type === 'personnel' ? '👥' : '📋';
-    html += `<div class="card">
+    html += `<div class="tree-node"><div class="tree-node-dot"></div><div class="card">
       <div class="card-header" style="background:${t.primary}">
         <h2>${icon} ${m.title}</h2>
         <button class="btn-icon" style="background:rgba(255,255,255,0.2);color:#fff" onclick="deleteModule('${m.id}')">🗑️</button>
@@ -149,9 +154,9 @@ function render() {
       html += `<button class="btn-add" onclick="showAddItem('${m.id}')">+ 添加子项</button>`;
     }
     
-    html += `</div></div>`;
+    html += `</div></div></div>`;
   });
-  
+
   html += `</div></div>`;
   document.getElementById('app').innerHTML = html;
   document.body.style.background = t.bg;

@@ -214,16 +214,29 @@ export function ContentModule({
           </>
         ) : (
           <>
-            <div className="space-y-3">
+            <div className="space-y-2 relative">
+              {/* 子项左侧树状连接线 */}
+              <div
+                className="absolute left-2 top-2 bottom-10 w-0.5"
+                style={{ backgroundColor: `${theme.secondaryColor}30` }}
+              />
               {module.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-start justify-between p-4 rounded-xl border transition-all duration-200 group"
+                  className="flex items-start justify-between p-4 rounded-xl border transition-all duration-200 group relative ml-6"
                   style={{
                     backgroundColor: theme.backgroundColor,
                     borderColor: theme.borderColor,
                   }}
                 >
+                  {/* 子项节点圆点 */}
+                  <div
+                    className="absolute -left-4 top-5 w-2.5 h-2.5 rounded-full border-2"
+                    style={{
+                      backgroundColor: theme.cardBackgroundColor,
+                      borderColor: theme.secondaryColor,
+                    }}
+                  />
                   <div className="flex-1">
                     <p style={{ color: theme.textColor }}>{item.content}</p>
                     {item.date && (
