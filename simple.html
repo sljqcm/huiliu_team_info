@@ -12,12 +12,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;border-radius:0.5rem;font-weight:500;cursor:pointer;border:none;margin:0.25rem}
 .btn-primary{background:#fff;color:#1e3a5f}
 .btn-secondary{background:rgba(255,255,255,0.2);color:#fff}
-.container{max-width:900px;margin:0 auto;padding:1rem}
-.tree-wrap{position:relative;padding-left:2rem}
-.tree-wrap::before{content:'';position:absolute;left:0.5rem;top:0;bottom:0;width:2px;background:rgba(59,130,246,0.3)}
-.tree-node{position:relative;margin-bottom:1rem}
-.tree-node::before{content:'';position:absolute;left:-1.5rem;top:1.5rem;width:1rem;height:2px;background:rgba(59,130,246,0.3)}
-.tree-node-dot{position:absolute;left:-1.7rem;top:1.35rem;width:0.75rem;height:0.75rem;border-radius:50%;background:#fff;border:3px solid #3b82f6}
+.layout{display:flex;max-width:1200px;margin:0 auto;min-height:calc(100vh - 200px)}
+.sidebar{width:240px;background:#fff;border-right:1px solid #e2e8f0;padding:1rem;flex-shrink:0}
+.sidebar-title{font-weight:700;padding-bottom:0.5rem;margin-bottom:0.5rem;border-bottom:1px solid #e2e8f0;color:#1e3a5f}
+.nav-item{display:flex;align-items:center;gap:0.5rem;width:100%;padding:0.6rem 0.75rem;border-radius:0.5rem;cursor:pointer;border:none;background:transparent;text-align:left;font-size:0.875rem;color:#475569;transition:all 0.2s}
+.nav-item:hover{background:rgba(59,130,246,0.1)}
+.nav-item.active{background:#3b82f6;color:#fff;font-weight:600}
+.workspace{flex:1;padding:1rem;min-width:0}
+.sidebar-toggle{display:none;padding:0.5rem 1rem;background:#fff;border:1px solid #e2e8f0;border-radius:0.5rem;cursor:pointer;margin-bottom:1rem}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:40}
+.overlay.show{display:block}
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);transition:transform 0.3s;z-index:50;overflow-y:auto}
+  .sidebar.show{transform:translateX(0)}
+  .sidebar-toggle{display:inline-flex;align-items:center;gap:0.5rem}
+}
 .card{background:#fff;border-radius:1rem;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden}
 .card-header{background:#1e3a5f;color:#fff;padding:1rem;display:flex;justify-content:space-between;align-items:center}
 .card-header h2{font-size:1.25rem}
@@ -94,8 +103,15 @@ const state = {
     {id:'green',name:'清新绿',primary:'#166534',secondary:'#22c55e',bg:'#f0fdf4'},
     {id:'purple',name:'科技紫',primary:'#581c87',secondary:'#a855f7',bg:'#faf5ff'}
   ],
-  currentTheme: JSON.parse(localStorage.getItem('huiliu-theme')) || {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'}
+  currentTheme: JSON.parse(localStorage.getItem('huiliu-theme')) || {id:'blue',name:'工业蓝',primary:'#1e3a5f',secondary:'#3b82f6',bg:'#f0f4f8'},
+  activeModuleId: null,
+  sidebarOpen: false
 };
+
+// 初始化默认选中第一个模块
+if (!state.activeModuleId && state.modules.length > 0) {
+  state.activeModuleId = state.modules[0].id;
+}
 
 function save() {
   localStorage.setItem('huiliu-modules', JSON.stringify(state.modules));
@@ -107,7 +123,14 @@ function genId() { return Math.random().toString(36).substr(2,9); }
 function render() {
   const t = state.currentTheme;
   document.body.style.background = t.bg;
-  
+
+  // 查找当前激活的模块
+  let activeModule = state.modules.find(m => m.id === state.activeModuleId);
+  if (!activeModule && state.modules.length > 0) {
+    activeModule = state.modules[0];
+    state.activeModuleId = activeModule.id;
+  }
+
   let html = `
   <div class="header" style="background:linear-gradient(135deg,${t.primary},${t.secondary})">
     <h1>灰硫班组信息</h1>
@@ -118,18 +141,37 @@ function render() {
     <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">⬆️ 导入数据</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
   </div>
-  <div class="container">
-    <div class="tree-wrap">`;
+  <div class="layout">
+    <div class="overlay ${state.sidebarOpen ? 'show' : ''}" onclick="toggleSidebar()"></div>
+    <aside class="sidebar ${state.sidebarOpen ? 'show' : ''}">
+      <div class="sidebar-title">模块目录</div>
+      <nav style="display:flex;flex-direction:column;gap:0.25rem">`;
 
-  state.modules.forEach(m => {
+  if (state.modules.length === 0) {
+    html += `<p style="text-align:center;padding:1rem;color:#94a3b8;font-size:0.875rem">暂无模块</p>`;
+  } else {
+    state.modules.forEach(m => {
+      const isActive = activeModule && m.id === activeModule.id;
+      const icon = m.type === 'personnel' ? '👥' : '📋';
+      html += `<button class="nav-item ${isActive ? 'active' : ''}" onclick="selectModule('${m.id}')">${icon} ${m.title}</button>`;
+    });
+  }
+
+  html += `</nav>
+    </aside>
+    <main class="workspace">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">☰ 打开目录</button>`;
+
+  if (activeModule) {
+    const m = activeModule;
     const icon = m.type === 'personnel' ? '👥' : '📋';
-    html += `<div class="tree-node"><div class="tree-node-dot"></div><div class="card">
+    html += `<div class="card">
       <div class="card-header" style="background:${t.primary}">
         <h2>${icon} ${m.title}</h2>
         <button class="btn-icon" style="background:rgba(255,255,255,0.2);color:#fff" onclick="deleteModule('${m.id}')">🗑️</button>
       </div>
       <div class="card-body">`;
-    
+
     if (m.type === 'personnel') {
       (m.persons || []).forEach(p => {
         html += `<div class="person-card">
@@ -153,13 +195,27 @@ function render() {
       });
       html += `<button class="btn-add" onclick="showAddItem('${m.id}')">+ 添加子项</button>`;
     }
-    
-    html += `</div></div></div>`;
-  });
 
-  html += `</div></div>`;
+    html += `</div></div>`;
+  } else {
+    html += `<div style="text-align:center;padding:4rem 1rem;color:#94a3b8">暂无模块，请点击上方按钮添加大项</div>`;
+  }
+
+  html += `</main>
+  </div>`;
   document.getElementById('app').innerHTML = html;
   document.body.style.background = t.bg;
+}
+
+function selectModule(id) {
+  state.activeModuleId = id;
+  state.sidebarOpen = false;
+  render();
+}
+
+function toggleSidebar() {
+  state.sidebarOpen = !state.sidebarOpen;
+  render();
 }
 
 function showThemes() {
@@ -229,6 +285,9 @@ function addModule() {
 function deleteModule(id) {
   if (confirm('确定删除此模块？')) {
     state.modules = state.modules.filter(m => m.id !== id);
+    if (state.activeModuleId === id) {
+      state.activeModuleId = state.modules.length > 0 ? state.modules[0].id : null;
+    }
     save();
     render();
   }
